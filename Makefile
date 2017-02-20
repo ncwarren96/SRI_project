@@ -1,5 +1,5 @@
 SOURCES=./sources
-SOURCESLIST=$(SOURCES)/InferenceEngine.cpp $(SOURCES)/InfoBase.cpp $(SOURCES)/KnowledgeBase.cpp $(SOURCES)/RuleBase.cpp /sources/Parse.cpp 
+SOURCESLIST=$(SOURCES)/InferenceEngine.cpp $(SOURCES)/InfoBase.cpp $(SOURCES)/KnowledgeBase.cpp $(SOURCES)/RuleBase.cpp $(SOURCES)/Parser.cpp 
 HEADERS=./headers
 OBJECTS=./objects
 EXEC = sri
@@ -11,8 +11,11 @@ GCC_FLAGS= -std=c++11
 $(EXEC): $(OBJECTS)/main.o $(OBJECTS)/InfoBase.o
 	$(GCC) $(OBJECTS)/main.o $(OBJECTS)/InfoBase.o -o $(EXEC)
 
+simple:	
+	$(GCC) $(INCLUDES) main.cpp $(SOURCESLIST) -o $(EXEC)
+	
 clean:
-	rm -rt $(EXEC)/*$(OBJECTS)*/
+	rm -rf *$(OBJECTS)/*
 
 $(OBJECTS)/InferenceEngine.o: $(SOURCES)/InferenceEngine.cpp
 	$(GCC) $(DEBUG) $(GCC_FLAGS) $(INCLUDES) $(SOURCES)/InferenceEngine.cpp -o $(OBJECTS)/InferenceEngine.o
