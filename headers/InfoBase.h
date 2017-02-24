@@ -7,8 +7,8 @@ class InfoBase{
 		InfoBase();
 		~InfoBase();
 		// Access Functions ------------------------------------------
-		virtual vector<string> lookup(string name);
-		virtual boolean check(string name);
+		virtual vector< vector<string> > lookup(string name);
+		virtual bool check(string name);
 		// Manipulation Functions ------------------------------------
 		virtual void add(string name, vector<string> targets);
 		virtual void remove(string name);
