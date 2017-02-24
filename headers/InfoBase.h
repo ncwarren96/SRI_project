@@ -7,10 +7,10 @@ class InfoBase{
 		InfoBase();
 		~InfoBase();
 		// Access Functions ------------------------------------------
-		virtual vector< vector<string> > lookup(string name);
-		virtual bool check(string name);
+		virtual vector< vector<string> > lookup(string name) = 0
+		virtual bool check(string name) = 0
 		// Manipulation Functions ------------------------------------
-		virtual void add(string name, vector<string> targets);
-		virtual void remove(string name);
+		virtual void add(string name, vector<string> targets) = 0
+		virtual void remove(string name) = 0
 };
 #endif
