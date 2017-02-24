@@ -1,10 +1,10 @@
 #include "common.h"
-#include "KnowledgeBase.h"
+//#include "KnowledgeBase.h"
 
 
 class InferenceEngine{
 	private:
-		KnowledgeBase * kb;
+		//KnowledgeBase * kb;
 		//RuleBase * rb;
 	
 	public:

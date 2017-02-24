@@ -2,7 +2,7 @@
 
 InferenceEngine::InferenceEngine(){
 	std::cout<<"construct InferenceEngine\n";
-	kb = new KnowledgeBase();
+	//kb = new KnowledgeBase();
 }
 
 InferenceEngine::~InferenceEngine(){
