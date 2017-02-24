@@ -2,6 +2,8 @@
 #include "InfoBase.h"
 
 class RuleBase: public InfoBase{
+	private:
+		unordered_map< string, vector< vector<string> > rule_map; 
 	public:
 		// Constructors and Destructors -----------------------------
 		RuleBase();
@@ -10,6 +12,6 @@ class RuleBase: public InfoBase{
 		virtual vector< vector<string> > lookup(string name);
 		virtual bool check(string name);
 		// Manipulation Functions ------------------------------------
-		virtual void add(string name, vector<string> targets);
+		virtual void add(vector<string> data);
 		virtual void remove(string name);
 };

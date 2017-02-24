@@ -10,7 +10,7 @@ class InfoBase{
 		virtual vector< vector<string> > lookup(string name) = 0;
 		virtual bool check(string name) = 0;
 		// Manipulation Functions ------------------------------------
-		virtual void add(string name, vector<string> targets) = 0;
+		virtual void add(vector<string> data) = 0;
 		virtual void remove(string name) = 0;
 };
 #endif
