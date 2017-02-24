@@ -3,7 +3,7 @@
 
 class RuleBase: public InfoBase{
 	private:
-		unordered_map< string, vector< vector<string> > rule_map; 
+		unordered_map< string, vector< vector<string> > > rule_map; 
 	public:
 		// Constructors and Destructors -----------------------------
 		RuleBase();
