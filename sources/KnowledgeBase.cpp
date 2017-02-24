@@ -38,7 +38,7 @@ void KnowledgeBase::add(vector<string> data) {
 	auto wasAdded = fact_map.emplace(name, container);	// attempt to create new map entry w/ key "name"
 	
 	if( wasAdded.second == false ) {	//if emplace failed due to duplicate key
-		(*wasAdded.first).second.push_back(targets);	//add targets to the vector at key "name" 
+		(*wasAdded.first).second.push_back(data);	//add targets to the vector at key "name" 
 	}
 }
 
