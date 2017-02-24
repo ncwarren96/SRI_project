@@ -8,11 +8,18 @@ class KnowledgeBase: public InfoBase{
 		// Constructors and Destructors ------------------------------
 		KnowledgeBase();
 		~KnowledgeBase();
+<<<<<<< HEAD
 		// Access Functions ------------------------------------------
 		vector< vector<string> > lookup(string name);	// returns the vector mapped at "name"
 		bool check(string name);			// true if fact with key "name" exists
 		// Manipulation Functions ------------------------------------
 		void add(string name, vector<string> targets);	// creates new fact with key "name" or appends targets to vector if "name" already mapped
 		void remove(string name);			// deletes entry with key "name"
+=======
+		vector<string> lookup(string name);
+		bool check(string name);
+		void add(string name, vector<string> targets);
+		void remove(string name);
+>>>>>>> origin/master
 
 };
