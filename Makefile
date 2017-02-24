@@ -16,7 +16,7 @@ simple:
 	$(GCC) $(INCLUDES) main.cpp $(SOURCESLIST) -o $(EXEC)
 	
 clean:
-	rm -rf $(OBJECTS)/*
+	rm -rf $(OBJECTS)/* $(EXEC)
 
 $(OBJECTS)/main.o: main.cpp
 	$(GCC) $(DEBUG) $(GCC_FLAGS) $(INCLUDES) main.cpp -o $(OBJECTS)/main.o

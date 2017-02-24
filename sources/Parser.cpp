@@ -64,17 +64,24 @@ void Parser::processRule(string p_string){
 }
 
 void Parser::processLoad(string p_string){
-	cout<<"Parsing load: "<<p_string<<endl;
+	ifstream readFile(p_string);
+	string line = "";
+	while(getline(readFile,line)){
+		stringstream newStream(line);
+		stringstream newStream1(line);
+		this->addLine(newStream);
+		this->processLine(newStream1);
+	}
 }
 
 void Parser::processDump(string p_string){
-	cout<<"Parsing dump: "<<p_string<<endl;
+	//cout<<"Parsing dump: "<<p_string<<endl;
 }
 
 void Parser::processInference(string p_string){
-	cout<<"Parsing inference: "<<p_string<<endl;
+	//cout<<"Parsing inference: "<<p_string<<endl;
 }
 
 void Parser::processDrop(string p_string){
-	cout<<"Parsing drop: "<<p_string<<endl;
+	//cout<<"Parsing drop: "<<p_string<<endl;
 }

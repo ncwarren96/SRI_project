@@ -8,7 +8,7 @@ class KnowledgeBase: public InfoBase{
 		KnowledgeBase();
 		~KnowledgeBase();
 		vector<string> lookup(string name);
-		boolean check(string name);
+		bool check(string name);
 		void add(string name, vector<string> targets);
 		void remove(string name);
 
