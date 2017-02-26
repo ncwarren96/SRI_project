@@ -11,6 +11,6 @@ class InfoBase{
 		virtual bool check(string name) = 0;
 		// Manipulation Functions ------------------------------------
 		virtual void add(vector<string> data) = 0;
-		virtual void remove(string name) = 0;
+		virtual void remove(vector<string> data) = 0;
 };
 #endif

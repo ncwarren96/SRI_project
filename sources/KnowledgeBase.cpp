@@ -38,12 +38,31 @@ void KnowledgeBase::add(vector<string> data) {
 	auto wasAdded = fact_map.emplace(name, container);	// attempt to create new map entry w/ key "name"
 	
 	if( wasAdded.second == false ) {	//if emplace failed due to duplicate key
-		(*wasAdded.first).second.push_back(data);	//add targets to the vector at key "name" 
+		// check to be sure element is not a duplicate:
+		if ( (std::find((*wasAdded.first).second.begin(), (*wasAdded.first).second.end(), data) == (*wasAdded.first).second.end())) {
+			(*wasAdded.first).second.push_back(data);	// if not, add targets to the vector at key "name" 
+		}
 	}
 }
 
-void KnowledgeBase::remove(string name) {
+void KnowledgeBase::removeAll(string name) {
 	fact_map.erase(name);
+}
+
+void KnowledgeBase::remove(vector<string> data) {
+	string name = data.front();	// store first element as name
+	data.erase(data.begin());	// delete first element
+	
+	vector< vector<string> > container;	// create 2D vector for emplace()
+	container.push_back(data);	// add data to the 2D vector container
+	
+	// look for item:
+	auto it = std::find(fact_map.at(name).begin(), fact_map.at(name).end(), data);
+	// if found:
+	if ( it != fact_map.at(name).end()) {
+		fact_map.at(name).erase(it); // erase item
+	}
+	
 }
 
 vector<vector<string>> KnowledgeBase::getFacts(){

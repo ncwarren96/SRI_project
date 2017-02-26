@@ -14,7 +14,8 @@ class KnowledgeBase: public InfoBase{
 		bool check(string name);			// true if fact with key "name" exists
 		// Manipulation Functions ------------------------------------
 		void add(vector<string> data);	// creates new fact with key "name" or appends targets to vector if "name" already mapped
-		void remove(string name);			// deletes entry with key "name"
-		
+		void removeAll(string name);	// deletes ENTIRE entry with key "name"
+		void remove(vector<string> data);	// delete specific fact, where data.begin = name of fact
+	
 		vector<vector<string>> getFacts();
 };

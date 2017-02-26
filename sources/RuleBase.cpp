@@ -37,12 +37,31 @@ void RuleBase::add(vector<string> data){
 	auto wasAdded = rule_map.emplace(name, container);	// attempt to create new map entry w/ key "name"
 	
 	if( wasAdded.second == false ) {	//if emplace failed due to duplicate key
-		(*wasAdded.first).second.push_back(data);	//add targets to the vector at key "name" 
+		// check to be sure it's not a duplicate:
+		if ( (std::find((*wasAdded.first).second.begin(), (*wasAdded.first).second.end(), data) == (*wasAdded.first).second.end())) {
+			(*wasAdded.first).second.push_back(data);	// if not, add targets to the vector at key "name" 
+		}
 	}
 }
 
-void RuleBase::remove(string name){
+void RuleBase::removeAll(string name){
 	rule_map.erase(name);
+}
+
+void RuleBase::remove(vector<string> data) {
+	string name = data.front();	// store first element as name
+	data.erase(data.begin());	// delete first element
+	
+	vector< vector<string> > container;	// create 2D vector for emplace()
+	container.push_back(data);	// add data to the 2D vector container
+	
+	// look for item:
+	auto it = std::find(rule_map.at(name).begin(), rule_map.at(name).end(), data);
+	// if found:
+	if ( it != rule_map.at(name).end()) {
+		rule_map.at(name).erase(it); // erase item
+	}
+	
 }
 
 vector<vector<string>> RuleBase::getRules(){

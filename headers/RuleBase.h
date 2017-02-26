@@ -13,7 +13,8 @@ class RuleBase: public InfoBase{
 		virtual bool check(string name);
 		// Manipulation Functions ------------------------------------
 		virtual void add(vector<string> data);
-		virtual void remove(string name);
+		void removeAll(string name);	// deletes ENTIRE entry with key "name"
+		void remove(vector<string> data);	// delete specific rule, where data.begin = name of rule
 	
 		vector<vector<string>> getRules();
 };
