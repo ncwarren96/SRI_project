@@ -15,5 +15,6 @@ class KnowledgeBase: public InfoBase{
 		// Manipulation Functions ------------------------------------
 		void add(vector<string> data);	// creates new fact with key "name" or appends targets to vector if "name" already mapped
 		void remove(string name);			// deletes entry with key "name"
-
+		
+		vector<vector<string>> getFacts();
 };

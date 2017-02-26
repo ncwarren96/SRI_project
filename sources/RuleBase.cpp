@@ -19,6 +19,7 @@ vector< vector<string> > RuleBase::lookup(string name){
 }
 
 bool RuleBase::check(string name){
+	cout<<"checking: "<<name<<endl;
 	if( rule_map.count(name) == 0) {
 		return false;
 	} else {
@@ -30,7 +31,7 @@ bool RuleBase::check(string name){
 void RuleBase::add(vector<string> data){
 	string name = data.front();	// store first element as name
 	data.erase(data.begin());	// delete first element
-	
+	cout<<"Adding rule: "<<name<<endl;
 	vector< vector<string> > container;	// create 2D vector for emplace()
 	container.push_back(data);	// add data to the 2D vector container
 	
@@ -43,4 +44,16 @@ void RuleBase::add(vector<string> data){
 
 void RuleBase::remove(string name){
 	rule_map.erase(name);
+}
+
+vector<vector<string>> RuleBase::getRules(){
+	vector<vector<string>> ret;
+	for(pair<string, vector<vector<string>>> element : rule_map ){
+		for(int i=0; i<element.second.size(); i++){
+			vector<string> rule = element.second[i];
+			rule.insert(rule.begin(), element.first);
+			ret.push_back(rule);
+		}
+	}
+	return ret;
 }

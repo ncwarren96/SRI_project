@@ -5,46 +5,40 @@
 #include "KnowledgeBase.h"
 #include "Parser.h"
 
-void get_usr_in(Parser * p_p){
+void get_usr_in(InferenceEngine * p_i){
 	while(true){
 		string ch;
-		getline(cin, ch);
+		getline(cin, ch, '\n');
 		if(ch == "quit" || ch == "q"){
 			break;
 		}else if(ch == "print" || ch == "p"){
-			p_p->printLines();
+			//p_p->printLines();
 		}else{
 			stringstream newStream(ch);
-			stringstream newStream1(ch);
-			p_p->processLine(newStream);
-			p_p->addLine(newStream1);
+			p_i->processLine(newStream);
+			//vector<string> strs = p_p->processLine(newStream);
+			//p_i->processLine(strs);
 		}
 	}
 }
 
 int main(int argc, char* argv[]){
-
 	InferenceEngine *ie = new InferenceEngine();
-	Parser *p = new Parser();
-	RuleBase *rb = new RuleBase();
+	//Parser *p = new Parser();
+	//RuleBase *rb = new RuleBase();
 	
 	if(argc > 1){
 		for(int i=1; i<argc; i++){
-			p->processLoad(argv[i]);
+			//vector<string> strs = p->processLoad(argv[i]);
+			//ie->processLine(strs);
 		}
 	}
-	//p->printLines();
-	// output "Hello, World!"
-	//cout << "Hello, World!\n";
-	// wait for an input from the user
-	/*string ch;
-	getline(cin, ch);
-	cout << ch << endl;*/
-	get_usr_in(p);
+	
+	get_usr_in(ie);
 	
 	delete(ie);
-	delete(p);
-	delete(rb);
+	//delete(p);
+	//delete(rb);
 	
 	return 0;
 }

@@ -45,3 +45,15 @@ void KnowledgeBase::add(vector<string> data) {
 void KnowledgeBase::remove(string name) {
 	fact_map.erase(name);
 }
+
+vector<vector<string>> KnowledgeBase::getFacts(){
+	vector<vector<string>> ret;
+	for(pair<string, vector<vector<string>>> element : fact_map ){
+		for(int i=0; i<element.second.size(); i++){
+			vector<string> fact = element.second[i];
+			fact.insert(fact.begin(), element.first);
+			ret.push_back(fact);
+		}
+	}
+	return ret;
+}

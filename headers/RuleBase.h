@@ -14,4 +14,6 @@ class RuleBase: public InfoBase{
 		// Manipulation Functions ------------------------------------
 		virtual void add(vector<string> data);
 		virtual void remove(string name);
+	
+		vector<vector<string>> getRules();
 };

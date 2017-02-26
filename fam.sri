@@ -11,6 +11,5 @@ RULE GrandMother($X,$Y):- AND Mother($X,$Z) Mother($Z,$Y)
 RULE GrandMother($X,$Y):- AND Mother($X,$Z) Father($Z,$Y)
 INFERENCE GrandFather($X,$Y) # prints the results on the terminal
 INFERENCE GrandFather($X,$Y) GF # will declare the results under a fact with the name GF
-DROP GF # delete all the facts created by the previous inference statement
 DROP Parent # delete the Parent rule
-DUMP updated_family_relation.sri # generate a sri file of the current KB and RB
+DROP GrandMother

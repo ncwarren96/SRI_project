@@ -1,12 +1,6 @@
 #include "Parser.h"
 
 Parser::Parser(){
-	funcMap.insert(make_pair("FACT", &Parser::processFact));
-	funcMap.insert(make_pair("RULE", &Parser::processRule));
-	funcMap.insert(make_pair("LOAD", &Parser::processLoad));
-	funcMap.insert(make_pair("DUMP", &Parser::processDump));
-	funcMap.insert(make_pair("INFERENCE", &Parser::processInference));
-	funcMap.insert(make_pair("DROP", &Parser::processDrop));
 }
 
 Parser::~Parser(){
@@ -25,16 +19,7 @@ void Parser::printLines(){
 	}
 }
 
-void Parser::processLine(stringstream & p_ss){
-	string action = "";
-	string body = "";
-	getline(p_ss,action,' ');
-	getline(p_ss,body, '#');
-	ParserMFP func = funcMap[action];
-	return (this->*func)(body);
-}
-
-void Parser::processFact(string p_string){
+vector<string> Parser::processFact(string p_string){
 	stringstream newStream(p_string);
 	vector<string> params;
 	string relationship = "";
@@ -43,12 +28,15 @@ void Parser::processFact(string p_string){
 	getline(newStream, relationship,'(');
 	getline(newStream, rest, ')');
 	stringstream newerStream(rest);
+	
+	params.push_back(relationship);
 	while(getline(newerStream, rest, ',')){
 		params.push_back(rest);
 	}
+	return params;
 }
 
-void Parser::processRule(string p_string){
+vector<string> Parser::processRule(string p_string){
 	stringstream newStream(p_string);
 	vector<string> params;
 	string rule = "";
@@ -58,30 +46,29 @@ void Parser::processRule(string p_string){
 	getline(newStream, rule, ':');
 	getline(newStream, rest, ' ');
 	getline(newStream, operand, ' ');
+	
+	params.push_back(rule);
+	params.push_back(operand);
 	while(getline(newStream, rest, ' ')){
 		params.push_back(rest);
 	}
+	return params;
 }
 
-void Parser::processLoad(string p_string){
-	ifstream readFile(p_string);
-	string line = "";
-	while(getline(readFile,line)){
-		stringstream newStream(line);
-		stringstream newStream1(line);
-		this->addLine(newStream);
-		this->processLine(newStream1);
-	}
-}
-
-void Parser::processDump(string p_string){
+vector<string> Parser::processDump(string p_string){
 	//cout<<"Parsing dump: "<<p_string<<endl;
+	vector<string> ret(2, "dump");
+	return ret;
 }
 
-void Parser::processInference(string p_string){
+vector<string> Parser::processInference(string p_string){
 	//cout<<"Parsing inference: "<<p_string<<endl;
+	vector<string> ret(2, "inference");
+	return ret;
 }
 
-void Parser::processDrop(string p_string){
-	//cout<<"Parsing drop: "<<p_string<<endl;
+vector<string> Parser::processDrop(string p_string){
+	//cout<<"Parsing drop: "<<p_string<<endl
+	vector<string> ret(2, "drop");
+	return ret;
 }
