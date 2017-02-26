@@ -19,7 +19,6 @@ vector< vector<string> > RuleBase::lookup(string name){
 }
 
 bool RuleBase::check(string name){
-	cout<<"checking: "<<name<<endl;
 	if( rule_map.count(name) == 0) {
 		return false;
 	} else {

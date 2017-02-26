@@ -25,9 +25,14 @@ InferenceEngine::~InferenceEngine(){
 
 void InferenceEngine::processLine(stringstream & p_ss){
 	string action = "";
+	string rest = "";
 	string body = "";
+	
 	getline(p_ss, action, ' ');
-	getline(p_ss, body, '#');
+	getline(p_ss, rest, '#');
+	stringstream newStream(rest);
+	getline(newStream, body, ' ');
+	
 	InEnMFP func = funcMap[action];
 	(this->*func)(body);
 }
@@ -75,13 +80,23 @@ void InferenceEngine::processDump(string p_string){
 }
 
 void InferenceEngine::processInference(string p_string){
-	cout<<"Inference processing Inference"<<endl;
+	vector<string> ret = p->processInference(p_string);
+	string name;
+	stringstream newStream(p_string);
+	getline(newStream, name, '(');
+	if(kb->check(name)){
+		cout<<"inf fact"<<endl;
+	}
+	if(rb->check(p_string)){
+		cout<<"inf rule"<<endl;
+	}
 }
 
 void InferenceEngine::processDrop(string p_string){
 	if(kb->check(p_string)){
 		kb->remove(p_string);
-	}else if(rb->check(p_string)){
+	}
+	if(rb->check(p_string)){
 		rb->remove(p_string);
 	}else{
 		cout<<"Nothing to remove"<<endl;

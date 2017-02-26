@@ -55,20 +55,12 @@ vector<string> Parser::processRule(string p_string){
 	return params;
 }
 
-vector<string> Parser::processDump(string p_string){
-	//cout<<"Parsing dump: "<<p_string<<endl;
-	vector<string> ret(2, "dump");
-	return ret;
-}
-
 vector<string> Parser::processInference(string p_string){
-	//cout<<"Parsing inference: "<<p_string<<endl;
-	vector<string> ret(2, "inference");
-	return ret;
-}
-
-vector<string> Parser::processDrop(string p_string){
-	//cout<<"Parsing drop: "<<p_string<<endl
-	vector<string> ret(2, "drop");
+	vector<string> ret;
+	string th;
+	stringstream newStream(p_string);
+	while(getline(newStream, th, ' ')){
+		ret.push_back(th);
+	}
 	return ret;
 }
