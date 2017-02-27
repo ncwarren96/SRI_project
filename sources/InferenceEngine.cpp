@@ -45,8 +45,8 @@ void InferenceEngine::processFact(string p_string){
 
 void InferenceEngine::processRule(string p_string){
 	cout<<"added rule "<<p_string<<endl;
-	vector<string> rule = p->processRule(p_string);
-	rb->add(rule);
+	map<string, vector<string>> rule = p->processRule(p_string);
+	//rb->add(rule);
 }
 
 void InferenceEngine::processLoad(string p_string){

@@ -11,7 +11,8 @@ class Parser{
 		void printLines();
 
 		vector<string> processFact(string p_string);
-		vector<string> processRule(string p_string);
+		map<string, vector<string>> processRule(string p_string);
+		vector<string> parseRule(string p_string);
 		vector<string> processDump(string p_string);
 		vector<string> processInference(string p_string);
 		vector<string> processDrop(string p_string);
