@@ -26,5 +26,5 @@ class InferenceEngine{
 		void processDrop(string p_string);
 		
 		string genFact(vector<string> p_strings);
-		string genRule(vector<string> p_strings);
+		string genRule(map<string, vector<string>> p_rule);
 };

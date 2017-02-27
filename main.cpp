@@ -8,7 +8,7 @@
 void get_usr_in(InferenceEngine * p_i){
 	while(true){
 		string ch;
-		getline(cin, ch, '\n');
+		getline(cin, ch);
 		if(ch == "quit" || ch == "q"){
 			break;
 		}else if(ch == "print" || ch == "p"){

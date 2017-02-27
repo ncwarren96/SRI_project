@@ -31,7 +31,7 @@ void InferenceEngine::processLine(stringstream & p_ss){
 	getline(p_ss, action, ' ');
 	getline(p_ss, rest, '#');
 	stringstream newStream(rest);
-	getline(newStream, body, ' ');
+	getline(newStream, body);
 	
 	InEnMFP func = funcMap[action];
 	(this->*func)(body);
@@ -46,7 +46,7 @@ void InferenceEngine::processFact(string p_string){
 void InferenceEngine::processRule(string p_string){
 	cout<<"added rule "<<p_string<<endl;
 	map<string, vector<string>> rule = p->processRule(p_string);
-	//rb->add(rule);
+	rb->add(rule);
 }
 
 void InferenceEngine::processLoad(string p_string){
@@ -63,7 +63,8 @@ void InferenceEngine::processDump(string p_string){
 	cout<<"Inference processing Dump"<<endl;
 	ofstream outputFile;
 	outputFile.open(p_string);
-	vector<vector<string>> facts, rules;
+	vector<vector<string>> facts;
+	vector<map<string, vector<string>>> rules;
 	facts = kb->getFacts();
 	rules = rb->getRules();
 	for(int i=0; i<facts.size(); i++){
@@ -73,7 +74,8 @@ void InferenceEngine::processDump(string p_string){
 		else outputFile<<fact<<endl;
 	}
 	for(int i=0; i<rules.size(); i++){
-		vector<string> th = rules[i];
+		map<string, vector<string>> th = rules[i];
+		//vector<string> th = rules[i];
 		string rule = genRule(th);
 		if(p_string=="") cout<<rule<<endl;
 		else outputFile<<rule<<endl;
@@ -84,25 +86,31 @@ void InferenceEngine::processDump(string p_string){
 void InferenceEngine::processInference(string p_string){
 	cout<<"Inference processing Inference"<<endl;
 	vector<string> ret = p->processInference(p_string);
-	string name;
-	stringstream newStream(p_string);
-	getline(newStream, name, '(');
-	string vars;
-	//while(getline(newStream, vars, ','));
-	if(kb->check(name)){
+	if(kb->check(ret[0])){
 		vector<string> members;
 		//members = kb->lookup(name);
-		for(int i=0; i<kb->lookup(name).size(); i++){
+		for(int i=0; i<kb->lookup(ret[0]).size(); i++){
 			//members = kb->lookup(name)[i];
-			cout<<kb->lookup(name)[i][0]<<endl;
+			cout<<kb->lookup(ret[0])[i][0]<<endl;
 		}
 	}
-	if(rb->check(p_string)){
-		vector<vector<string>> rules = rb->lookup(p_string);
-		for(int i; i<rules.size(); i++){
-			for(int j; j<rules[i].size(); j++){
-				cout<<rules[i][j]<<endl;
+	if(rb->check(ret[0])){
+		vector<map<string, vector<string>>> rules = rb->lookup(ret[0]);
+		map<string, vector<string>> rule;
+		bool isrule = false;
+		for(int i=0; i<rules.size(); i++){
+			rule = rules[i];
+			if(rule["vars"].size() != ret.size()-1){
+				continue;
+			}else{
+				isrule = true;
+				break;
 			}
+		}
+		if(isrule){
+			cout<<"Found rule with "<<rule["vars"].size()<<" params"<<endl;
+		}else{
+			cout<<"No rule with "<<ret.size()<<" params"<<endl;
 		}
 		cout<<"inf rule"<<endl;
 	}
@@ -138,7 +146,35 @@ string InferenceEngine::genFact(vector<string> p_strings){
 	return ret;
 }
 
-string InferenceEngine::genRule(vector<string> p_strings){
+string InferenceEngine::genRule(map<string, vector<string>> p_rule){
+	string ret = "";
+	stringstream s_stream(ios_base::in | ios_base::out);
+	s_stream<<"RULE "<<p_rule["name"][0]<<"(";
+	
+	int i;
+	for(i=0; i<p_rule["vars"].size()-1; i++){
+		s_stream<<p_rule["vars"][i]<<", ";
+	}
+	s_stream<<p_rule["vars"][i]<<"):- "<<p_rule["operand"][0];
+	
+	i=1;
+	string target = "target"+to_string(i);
+	while(p_rule.find(target) != p_rule.end()){
+		s_stream<<" "<<p_rule[target][0]<<"(";
+		int j;
+		for(j=1; j<p_rule[target].size()-1; j++){
+			s_stream<<p_rule[target][j]<<",";
+		}
+		s_stream<<p_rule[target][j]<<")";
+		i++;
+		target = "target"+to_string(i);
+	}
+	
+	getline(s_stream, ret);
+	return ret;
+}
+
+/*string InferenceEngine::genRule(vector<string> p_strings){
 	string ret = "";
 	stringstream s_stream("RULE ", ios_base::in | ios_base::out);
 	s_stream << "RULE " << p_strings[0] << ":- ";
@@ -150,4 +186,4 @@ string InferenceEngine::genRule(vector<string> p_strings){
 	}
 	getline(s_stream, ret);
 	return ret;
-}
+}*/

@@ -57,6 +57,7 @@ map<string, vector<string>> Parser::processRule(string p_string){
 		string target = "target";
 		target += to_string(i);
 		rule[target] = parseRule(param);
+		i++;
 	}
 
 	return rule;
@@ -77,7 +78,6 @@ map<string, vector<string>> Parser::processRule(string p_string){
 }
 
 vector<string> Parser::parseRule(string p_string){
-	cout<<p_string<<endl;
 	vector<string> ret;
 	string name, params, var;
 	stringstream newStream(p_string);
@@ -92,11 +92,6 @@ vector<string> Parser::parseRule(string p_string){
 }
 
 vector<string> Parser::processInference(string p_string){
-	vector<string> ret;
-	string th;
-	stringstream newStream(p_string);
-	while(getline(newStream, th, ' ')){
-		ret.push_back(th);
-	}
+	vector<string> ret = parseRule(p_string);
 	return ret;
 }

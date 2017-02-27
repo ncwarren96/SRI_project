@@ -10,8 +10,8 @@ RuleBase::~RuleBase(){
 }
 
 // Access Functions --------------------------------------------------------
-vector< vector<string> > RuleBase::lookup(string name){
-	if( rule_map.count(name) == 0 ) {
+vector<map<string, vector<string>>> RuleBase::lookup(string name){
+	if( rule_map.find(name) == rule_map.end() ) {
 		cout << "Invalid rule name: " << name << endl;
 		exit(0);
 	}
@@ -19,15 +19,20 @@ vector< vector<string> > RuleBase::lookup(string name){
 }
 
 bool RuleBase::check(string name){
-	if( rule_map.count(name) == 0) {
+	if( rule_map.find(name) == rule_map.end()) {
 		return false;
 	} else {
 		return true;
 	}
 }
 
+void RuleBase::add(map<string, vector<string>> data){
+	string name = data["name"][0];
+	rule_map[name].push_back(data);
+}
+
 // Manipulation Functions --------------------------------------------------
-void RuleBase::add(vector<string> data){
+/*void RuleBase::add(vector<string> data){
 	string name = data.front();	// store first element as name
 	data.erase(data.begin());	// delete first element
 	cout<<"Adding rule: "<<name<<endl;
@@ -41,14 +46,14 @@ void RuleBase::add(vector<string> data){
 			(*wasAdded.first).second.push_back(data);	// if not, add targets to the vector at key "name" 
 		}
 	}
-}
+}*/
 
 void RuleBase::removeAll(string name){
 	rule_map.erase(name);
 }
 
 void RuleBase::remove(vector<string> data) {
-	string name = data.front();	// store first element as name
+	/*string name = data.front();	// store first element as name
 	data.erase(data.begin());	// delete first element
 	
 	vector< vector<string> > container;	// create 2D vector for emplace()
@@ -60,18 +65,24 @@ void RuleBase::remove(vector<string> data) {
 	if ( it != rule_map.at(name).end()) {
 		rule_map.at(name).erase(it); // erase item
 	}
-	
+	*/
 }
 
-vector<vector<string>> RuleBase::getRules(){
-	vector<vector<string>> ret;
-	for(pair<string, vector<vector<string>>> element : rule_map ){
+vector<map<string, vector<string>>> RuleBase::getRules(){
+	vector<map<string, vector<string>>> ret;
+	for(pair<string, vector<map<string, vector<string>>>> element : rule_map){
+		for(int i=0; i<element.second.size(); i++){
+			map<string, vector<string>> rule = element.second[i];
+			ret.push_back(rule);
+		}
+	}
+	/*for(pair<string, vector<vector<string>>> element : rule_map ){
 		for(int i=0; i<element.second.size(); i++){
 			vector<string> rule = element.second[i];
 			rule.insert(rule.begin(), element.first);
 			ret.push_back(rule);
 		}
-	}
+	}*/
 	return ret;
 }
 
