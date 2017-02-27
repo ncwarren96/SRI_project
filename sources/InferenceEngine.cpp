@@ -31,7 +31,7 @@ void InferenceEngine::processLine(stringstream & p_ss){
 	getline(p_ss, action, ' ');
 	getline(p_ss, rest, '#');
 	stringstream newStream(rest);
-	getline(newStream, body);
+	getline(newStream, body, ' ');
 	
 	InEnMFP func = funcMap[action];
 	(this->*func)(body);
@@ -125,7 +125,7 @@ void InferenceEngine::processDrop(string p_string){
 
 string InferenceEngine::genFact(vector<string> p_strings){
 	string ret = "";
-	stringstream s_stream("", ios_base::in | ios_base::out);
+	stringstream s_stream("FACT ", ios_base::in | ios_base::out);
 	s_stream << "FACT "<< p_strings[0] << "(";
 	int i;
 	for(i=1; i<p_strings.size()-1; i++){
@@ -140,11 +140,11 @@ string InferenceEngine::genFact(vector<string> p_strings){
 
 string InferenceEngine::genRule(vector<string> p_strings){
 	string ret = "";
-	stringstream s_stream("", ios_base::in | ios_base::out);
+	stringstream s_stream("RULE ", ios_base::in | ios_base::out);
 	s_stream << "RULE " << p_strings[0] << ":- ";
 	s_stream << p_strings[1] << " ";
 	int i;
-	for(i=2; i<p_strings.size(); i++){
+	for(i=0; i<p_strings.size()-1; i++){
 		string s = p_strings[i]; 
 		s_stream<<s<<" ";
 	}
