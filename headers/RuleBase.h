@@ -3,7 +3,7 @@
 
 class RuleBase: public InfoBase{
 	private:
-		unordered_map< string, vector< vector<string> > > rule_map; 
+		unordered_map< string, vector< vector<string> > > rule_map;
 	public:
 		// Constructors and Destructors -----------------------------
 		RuleBase();
@@ -11,6 +11,8 @@ class RuleBase: public InfoBase{
 		// Access Functions ------------------------------------------
 		virtual vector< vector<string> > lookup(string name);
 		virtual bool check(string name);
+		
+		int numRules();
 		// Manipulation Functions ------------------------------------
 		virtual void add(vector<string> data);
 		void removeAll(string name);	// deletes ENTIRE entry with key "name"

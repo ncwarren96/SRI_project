@@ -11,7 +11,7 @@ KnowledgeBase::~KnowledgeBase(){
 
 // Access Functions ------------------------------------------------------------
 vector< vector<string> > KnowledgeBase::lookup(string name){
-	if( fact_map.count(name) == 0) {
+	if(!check(name)){
 		cout << "Invalid fact name: " << name << endl;
 		exit(0);
 	}
@@ -75,4 +75,9 @@ vector<vector<string>> KnowledgeBase::getFacts(){
 		}
 	}
 	return ret;
+}
+
+
+int KnowledgeBase::numFacts(){
+	return fact_map.size();
 }

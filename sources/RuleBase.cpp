@@ -33,7 +33,6 @@ void RuleBase::add(vector<string> data){
 	cout<<"Adding rule: "<<name<<endl;
 	vector< vector<string> > container;	// create 2D vector for emplace()
 	container.push_back(data);	// add data to the 2D vector container
-	
 	auto wasAdded = rule_map.emplace(name, container);	// attempt to create new map entry w/ key "name"
 	
 	if( wasAdded.second == false ) {	//if emplace failed due to duplicate key
@@ -74,4 +73,8 @@ vector<vector<string>> RuleBase::getRules(){
 		}
 	}
 	return ret;
+}
+
+int RuleBase::numRules(){
+	return rule_map.size();
 }

@@ -1,0 +1,4 @@
+FACT foo(a)
+FACT foo(b)
+FACT foo(c)
+
