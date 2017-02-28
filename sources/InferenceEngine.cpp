@@ -85,22 +85,64 @@ void InferenceEngine::processDump(string p_string){
 
 void InferenceEngine::processInference(string p_string){
 	cout<<"Inference processing Inference"<<endl;
-	vector<string> ret = p->processInference(p_string);
-	if(kb->check(ret[0])){
-		vector<string> members;
-		//members = kb->lookup(name);
-		for(int i=0; i<kb->lookup(ret[0]).size(); i++){
-			//members = kb->lookup(name)[i];
-			cout<<kb->lookup(ret[0])[i][0]<<endl;
+	vector<string> query = p->processInference(p_string);
+	string name = query[0];
+	query.erase(query.begin());
+	//FACT INFERENCE
+	if(kb->check(name)){
+		cout<<"inferenceing fact"<<endl;
+		vector<vector<string>> members = kb->lookup(name); //get fact vector
+		int nparams = query.size(); //get num params that are being queried
+		vector< map<string,string>> result; //NEEDS TO BE INITIALIZED, THIS CAUSES SEG FAULT
+		
+		//iterate through all matching facts
+		for(int fact = 0; fact<members.size(); fact++){
+			
+			//iterate through each queried param ($X, $Y, $Z)
+			for(int i=0; i<nparams; i++){
+				string curr = query[i]; //the current queried param ($X)
+				map<string,string> param_map = result[fact]; //the map with current param as key ($X)
+				string fact_item = members[fact][i]; //the next item in curent fact
+				cout<<fact_item<<endl;
+				//check if curr has been mapped
+				/*if(param_map[curr] == ""){
+					//if not mapped, map to next rule param
+					param_map[curr] = fact_item;
+				}else{
+					//check if curr is same as the mapped item
+					if(param_map[curr] != fact_item){
+						break; //the fact does not match query
+					}else{
+						cout<<fact_item<<endl;
+					}
+				}*/
+				//check if curr has been mapped
+					
+				//else
+					
+			}
 		}
+		
+		//cout<<nparams<<endl;
+		/*for(int i=0; i<members.size(); i++){
+			if(nparams==members[i].size()){
+				for(int j=0; j<nparams; j++){
+					cout<<ret[j+1]<<": ";
+					cout<<members[i][j]<<"\t";
+				}
+				cout<<endl;
+			}
+		}*/
 	}
-	if(rb->check(ret[0])){
-		vector<map<string, vector<string>>> rules = rb->lookup(ret[0]);
+	
+	//RULE INFERENCE
+	if(rb->check(name)){
+		vector<map<string, vector<string>>> rules = rb->lookup(name);
 		map<string, vector<string>> rule;
 		bool isrule = false;
 		for(int i=0; i<rules.size(); i++){
 			rule = rules[i];
-			if(rule["vars"].size() != ret.size()-1){
+			if(rule["vars"].size() != query.size()-1){
 				continue;
 			}else{
 				isrule = true;
@@ -110,7 +152,7 @@ void InferenceEngine::processInference(string p_string){
 		if(isrule){
 			cout<<"Found rule with "<<rule["vars"].size()<<" params"<<endl;
 		}else{
-			cout<<"No rule with "<<ret.size()<<" params"<<endl;
+			cout<<"No rule with "<<query.size()<<" params"<<endl;
 		}
 		cout<<"inf rule"<<endl;
 	}
