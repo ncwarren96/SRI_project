@@ -92,11 +92,15 @@ void InferenceEngine::processInference(string p_string){
 	if(kb->check(name)){
 		cout<<"inferenceing fact"<<endl;
 		vector<vector<string>> members = kb->lookup(name); //get fact vector
-		int nparams = query.size(); //get num params that are being queried
+		int nparams = query.size(); //get num params that are being queried 
 		vector< map<string,string>> result; //NEEDS TO BE INITIALIZED, THIS CAUSES SEG FAULT
+		map<string,string> initial;	//used to initalize results
+		result.push_back(initial);
 		
 		//iterate through all matching facts
 		for(int fact = 0; fact<members.size(); fact++){
+			
+			if(nparams != members[fact].size()) continue; // if param numbers dont match, move to next fact in the kb
 			
 			//iterate through each queried param ($X, $Y, $Z)
 			for(int i=0; i<nparams; i++){
@@ -105,7 +109,7 @@ void InferenceEngine::processInference(string p_string){
 				string fact_item = members[fact][i]; //the next item in curent fact
 				cout<<fact_item<<endl;
 				//check if curr has been mapped
-				/*if(param_map[curr] == ""){
+				/*if(param_map.find(curr) == param_map.end()){
 					//if not mapped, map to next rule param
 					param_map[curr] = fact_item;
 				}else{
@@ -118,8 +122,7 @@ void InferenceEngine::processInference(string p_string){
 				}*/
 				//check if curr has been mapped
 					
-				//else
-					
+				//else	
 			}
 		}
 		
@@ -137,6 +140,7 @@ void InferenceEngine::processInference(string p_string){
 	
 	//RULE INFERENCE
 	if(rb->check(name)){
+		cout << "rb->check(name)\n";
 		vector<map<string, vector<string>>> rules = rb->lookup(name);
 		map<string, vector<string>> rule;
 		bool isrule = false;
