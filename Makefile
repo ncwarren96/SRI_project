@@ -13,7 +13,7 @@ $(EXEC): $(OBJECTSLIST)
 	$(GCC) $(OBJECTSLIST) -o $(EXEC)
 
 simple:	
-	$(GCC) $(INCLUDES) main.cpp $(SOURCESLIST) -o $(EXEC)
+	$(GCC) -std=c++11 $(INCLUDES) main.cpp $(SOURCESLIST) -o $(EXEC)
 	
 clean:
 	rm -rf $(OBJECTS)/* $(EXEC)
