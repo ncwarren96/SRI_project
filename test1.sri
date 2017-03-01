@@ -1,4 +1,4 @@
-FACT foo(a)
-FACT foo(b)
-FACT foo(c)
+FACT foo(a,b,c)
+FACT foo(a,b,a)
+FACT foo(c,c,c)
 RULE myRule($A,$B):- AND foo($A) foo($B)

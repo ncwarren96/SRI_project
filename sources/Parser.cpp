@@ -57,24 +57,11 @@ map<string, vector<string>> Parser::processRule(string p_string){
 		string target = "target";
 		target += to_string(i);
 		rule[target] = parseRule(param);
+		rule["ts"].push_back("");
 		i++;
 	}
 
 	return rule;
-	/*getline(newStream, rule, '(');
-	getline(newStream, vars, ')');
-	getline(newStream, rest, ' ');
-	getline(newStream, operand, ' ');
-	while(getline(newStream, param, ' ')){
-		stringstream iss(param);
-	}
-	
-	params.push_back(rule);
-	params.push_back(operand);
-	while(getline(newStream, rest, ' ')){
-		params.push_back(rest);
-	}
-	return params;*/
 }
 
 vector<string> Parser::parseRule(string p_string){

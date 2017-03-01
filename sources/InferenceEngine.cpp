@@ -83,72 +83,85 @@ void InferenceEngine::processDump(string p_string){
 	outputFile.close();
 }
 
+vector<map<string,string>> InferenceEngine::inferenceFact(string p_name, vector<string> & p_vars){
+	cout<<"inferenceing fact: "<<p_name<<endl;
+	vector<vector<string>> members = kb->lookup(p_name); //get fact vector
+	int nparams = p_vars.size(); //get num params that are being queried 
+	vector< map<string,string>> result; //NEEDS TO BE INITIALIZED, THIS CAUSES SEG FAULT
+		
+		
+	//iterate through all matching facts
+	for(int fact = 0; fact<members.size(); fact++){
+			
+		if(nparams != members[fact].size()) continue; // if param numbers dont match, move to next fact in the kb
+
+		map<string,string> param_map; 
+		bool matches = true;;
+
+		//iterate through each queried param ($X, $Y, $Z)
+		for(int i=0; i<nparams; i++){
+
+			string curr = p_vars[i]; //the current queried param ($X)
+			string fact_item = members[fact][i]; //the next item in curent fact
+
+			//check if curr has been mapped
+			if(param_map.find(curr) == param_map.end()){
+
+				//if not mapped, map to next rule param
+				param_map[curr] = fact_item;
+			}else{
+
+				//check if curr is same as the mapped item
+				if(param_map[curr] != fact_item){
+					matches = false;
+					break; //the fact does not match query
+				}
+			}
+		}
+
+		//if the fact has parameters that match the queried params ($X, $Y, $Z) add the map to the result
+		if(matches){
+			result.push_back(param_map);
+		}
+	}
+	return result;
+}
+
 void InferenceEngine::processInference(string p_string){
 	cout<<"Inference processing Inference"<<endl;
 	vector<string> query = p->processInference(p_string);
 	string name = query[0];
 	query.erase(query.begin());
+
 	//FACT INFERENCE
 	if(kb->check(name)){
-		cout<<"inferenceing fact"<<endl;
-		vector<vector<string>> members = kb->lookup(name); //get fact vector
-		int nparams = query.size(); //get num params that are being queried 
-		vector< map<string,string>> result; //NEEDS TO BE INITIALIZED, THIS CAUSES SEG FAULT
-		map<string,string> initial;	//used to initalize results
-		result.push_back(initial);
-		
-		//iterate through all matching facts
-		for(int fact = 0; fact<members.size(); fact++){
-			
-			if(nparams != members[fact].size()) continue; // if param numbers dont match, move to next fact in the kb
-			
-			//iterate through each queried param ($X, $Y, $Z)
-			for(int i=0; i<nparams; i++){
-				string curr = query[i]; //the current queried param ($X)
-				map<string,string> param_map = result[fact]; //the map with current param as key ($X)
-				string fact_item = members[fact][i]; //the next item in curent fact
-				cout<<fact_item<<endl;
-				//check if curr has been mapped
-				/*if(param_map.find(curr) == param_map.end()){
-					//if not mapped, map to next rule param
-					param_map[curr] = fact_item;
-				}else{
-					//check if curr is same as the mapped item
-					if(param_map[curr] != fact_item){
-						break; //the fact does not match query
-					}else{
-						cout<<fact_item<<endl;
-					}
-				}*/
-				//check if curr has been mapped
-					
-				//else	
+		vector<map<string,string>> result = inferenceFact(name, query);
+
+		//print results of inference
+		for(int r=0; r<result.size(); r++){
+			for(int p=0; p<query.size(); p++){
+				string par = query[p];
+				cout<<par<<": "<<result[r][par]<<"\t";
 			}
+			cout<<endl;
 		}
-		
-		//cout<<nparams<<endl;
-		/*for(int i=0; i<members.size(); i++){
-			if(nparams==members[i].size()){
-				for(int j=0; j<nparams; j++){
-					cout<<ret[j+1]<<": ";
-					cout<<members[i][j]<<"\t";
-				}
-				cout<<endl;
-			}
-		}*/
 	}
 	
 	//RULE INFERENCE
 	if(rb->check(name)){
-		cout << "rb->check(name)\n";
-		vector<map<string, vector<string>>> rules = rb->lookup(name);
+		vector<map<string,string>> results = inferenceRule(name, query);
+		auto q = results[0];
+		results.erase(results.begin());
+		if(q["returned"] == "false"){
+			cout<<"No rule found"<<endl;
+			return;
+		}
+		/*vector<map<string, vector<string>>> rules = rb->lookup(name);
 		map<string, vector<string>> rule;
 		bool isrule = false;
 		for(int i=0; i<rules.size(); i++){
 			rule = rules[i];
-			if(rule["vars"].size() != query.size()-1){
-				continue;
-			}else{
+			if(rule["vars"].size() == query.size()){
 				isrule = true;
 				break;
 			}
@@ -157,9 +170,65 @@ void InferenceEngine::processInference(string p_string){
 			cout<<"Found rule with "<<rule["vars"].size()<<" params"<<endl;
 		}else{
 			cout<<"No rule with "<<query.size()<<" params"<<endl;
-		}
+		}*/
 		cout<<"inf rule"<<endl;
 	}
+}
+
+map<string, vector<string>> InferenceEngine::findRule(string p_name, int p_size){
+	vector<map<string, vector<string>>> rules = rb->lookup(p_name);
+	map<string, vector<string>> rule;
+
+	for(int i=0; i<rules.size(); i++){
+		rule = rules[i];
+		if(rule["vars"].size() == p_size){
+			rule["returned"].push_back("true");
+			return rule;
+		}
+	}
+
+	rule["returned"].push_back("false");
+	return rule;
+}
+
+vector<map<string,string>> InferenceEngine::inferenceRule(string p_name, vector<string> & p_vars){
+	vector<map<string,string>> result; //vector to return
+	map<string, vector<string>> rule = findRule(p_name, p_vars.size()); //get the rule we want to use
+	string ret = rule["returned"][0]; //ret = "false" if rule doesnt exist, "true" if it does
+	
+	//make sure the calling function knows whether there actually is a rule for the one the user wants to inference
+	if(ret == "false"){
+		map<string,string> fa;
+		fa["returned"] = "false";
+		result.push_back(fa);
+		return result;
+	}else{
+		map<string,string> fa;
+		fa["returned"] = "true";
+		result.push_back(fa);
+	}
+
+	vector<vector<string>> targets;
+	for(int i=1; i<rule["ts"].size()+1; i++){
+		string target = "target"+to_string(i);
+		vector<string> t = rule[target];
+		targets.push_back(t);
+	}
+
+	vector<vector<map<string,string>>> target_returns;
+	for(int i=0; i<targets.size(); i++){
+		string name = targets[i][0];
+		targets[i].erase(targets[i].begin());
+		if(kb->ckeck(name)){
+			vector<map<string,string>> t = inferenceFact(name, targets[i]);
+			target_returns.push_back(t);
+		}else if(rb->check(name)){
+			vector<map<string,string>> t = inferenceRule(name, targets[i])
+			target_returns.push_back(t);
+		}
+	}
+
+	return result;
 }
 
 void InferenceEngine::processDrop(string p_string){
@@ -199,37 +268,21 @@ string InferenceEngine::genRule(map<string, vector<string>> p_rule){
 	
 	int i;
 	for(i=0; i<p_rule["vars"].size()-1; i++){
-		s_stream<<p_rule["vars"][i]<<", ";
+		s_stream<<p_rule["vars"][i]<<",";
 	}
 	s_stream<<p_rule["vars"][i]<<"):- "<<p_rule["operand"][0];
-	
-	i=1;
-	string target = "target"+to_string(i);
-	while(p_rule.find(target) != p_rule.end()){
+
+	for(int t=1; t<=p_rule["ts"].size(); t++){
+		string target = "target"+to_string(t);
 		s_stream<<" "<<p_rule[target][0]<<"(";
+		cout<<p_rule[target].size()<<endl;
 		int j;
 		for(j=1; j<p_rule[target].size()-1; j++){
 			s_stream<<p_rule[target][j]<<",";
 		}
 		s_stream<<p_rule[target][j]<<")";
-		i++;
-		target = "target"+to_string(i);
 	}
 	
 	getline(s_stream, ret);
 	return ret;
 }
-
-/*string InferenceEngine::genRule(vector<string> p_strings){
-	string ret = "";
-	stringstream s_stream("RULE ", ios_base::in | ios_base::out);
-	s_stream << "RULE " << p_strings[0] << ":- ";
-	s_stream << p_strings[1] << " ";
-	int i;
-	for(i=0; i<p_strings.size()-1; i++){
-		string s = p_strings[i]; 
-		s_stream<<s<<" ";
-	}
-	getline(s_stream, ret);
-	return ret;
-}*/

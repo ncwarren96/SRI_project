@@ -22,6 +22,9 @@ class InferenceEngine{
 		void processRule(string p_string);
 		void processLoad(string p_string);
 		void processDump(string p_string);
+		vector<map<string,string>> inferenceFact(string p_name, vector<string> & p_vars);
+		vector<map<string,string>> inferenceRule(string p_name, vector<string> & p_vars);
+		map<string, vector<string>> findRule(string p_name, int p_size);
 		void processInference(string p_string);
 		void processDrop(string p_string);
 		
