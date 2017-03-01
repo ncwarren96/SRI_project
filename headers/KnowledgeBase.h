@@ -3,7 +3,7 @@
 
 class KnowledgeBase: public InfoBase{
 	private:
-		unordered_map< string, vector< vector<string> > > fact_map;
+		map< string, vector< vector<string> > > fact_map;
 	public:
 		// Constructors and Destructors ------------------------------
 		KnowledgeBase();

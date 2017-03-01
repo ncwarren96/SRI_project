@@ -26,12 +26,13 @@ bool RuleBase::check(string name){
 	}
 }
 
+// Manipulation Functions --------------------------------------------------
 void RuleBase::add(map<string, vector<string>> data){
 	string name = data["name"][0];
 	rule_map[name].push_back(data);
 }
 
-// Manipulation Functions --------------------------------------------------
+
 /*void RuleBase::add(vector<string> data){
 	string name = data.front();	// store first element as name
 	data.erase(data.begin());	// delete first element
@@ -52,20 +53,17 @@ void RuleBase::removeAll(string name){
 	rule_map.erase(name);
 }
 
-void RuleBase::remove(vector<string> data) {
-	/*string name = data.front();	// store first element as name
-	data.erase(data.begin());	// delete first element
-	
-	vector< vector<string> > container;	// create 2D vector for emplace()
-	container.push_back(data);	// add data to the 2D vector container
+void RuleBase::remove(map<string, vector<string>> data) {
+	vector<string> temp = data.at("name");
 	
 	// look for item:
-	auto it = std::find(rule_map.at(name).begin(), rule_map.at(name).end(), data);
+	auto it = std::find(rule_map.at(temp[0]).begin(), rule_map.at(temp[0]).end(), data);
 	// if found:
-	if ( it != rule_map.at(name).end()) {
-		rule_map.at(name).erase(it); // erase item
+	if ( it != rule_map.at(temp[0]).end()) {
+		//std::cout << "found duplicate";
+		rule_map.at(temp[0]).erase(it); // erase item
+	
 	}
-	*/
 }
 
 vector<map<string, vector<string>>> RuleBase::getRules(){

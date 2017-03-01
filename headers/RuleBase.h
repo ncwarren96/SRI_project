@@ -1,5 +1,4 @@
 #include "common.h"
-#include "InfoBase.h"
 
 class RuleBase{
 	private:
@@ -14,9 +13,9 @@ class RuleBase{
 		
 		int numRules();
 		// Manipulation Functions ------------------------------------
-		void add(map<string, vector<string>>);
+		void add(map<string, vector<string>> data);
 		void removeAll(string name);	// deletes ENTIRE entry with key "name"
-		void remove(vector<string> data);	// delete specific rule, where data.begin = name of rule
+		void remove(map<string, vector<string>> data);	// delete specific rule, where data.begin = name of rule
 	
 		vector<map<string, vector<string>>> getRules();
 };
