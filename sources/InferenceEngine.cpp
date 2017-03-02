@@ -245,7 +245,11 @@ vector<map<string,string>> InferenceEngine::inferenceRule(string p_name, vector<
 		result = findAND(target_returns);
 	}else if(op == "OR"){
 		for(int i = 0; i<target_returns.size(); i++){
-			vector<map<string,string>> temp = target_returns[i];
+			for(int j = 0; j<target_returns[i].size(); j++){
+				//if(target_returns[i][j][""] != ){
+					result.push_back(target_returns[i][j]);
+				//}
+			}
 			
 		}
 		
