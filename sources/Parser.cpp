@@ -4,7 +4,7 @@ Parser::Parser(){
 }
 
 Parser::~Parser(){
-	cout<<"destructing Parser\n";
+	//cout<<"destructing Parser\n";
 }
 
 void Parser::addLine(stringstream & p_ss){
@@ -20,11 +20,14 @@ void Parser::printLines(){
 }
 
 vector<string> Parser::processFact(string p_string){
+	
+	//declare vector and initialize stream
 	stringstream newStream(p_string);
 	vector<string> params;
+	
 	string relationship = "";
 	string rest = "";
-
+	
 	getline(newStream, relationship,'(');
 	getline(newStream, rest, ')');
 	stringstream newerStream(rest);

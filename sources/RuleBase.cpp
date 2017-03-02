@@ -2,11 +2,11 @@
 
 // Constructors and Destructors --------------------------------------------
 RuleBase::RuleBase(){
-	cout<<"contructed RuleBase\n";
+	//cout<<"contructed RuleBase\n";
 }
 
 RuleBase::~RuleBase(){
-	cout<<"destructed RuleBase\n";
+	//cout<<"destructed RuleBase\n";
 }
 
 // Access Functions --------------------------------------------------------

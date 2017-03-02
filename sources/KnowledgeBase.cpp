@@ -2,11 +2,11 @@
 
 // Constructors and Destructors ------------------------------------------------
 KnowledgeBase::KnowledgeBase(){
-	cout<<"constructed KnowledgeBase\n";
+	//cout<<"constructed KnowledgeBase\n";
 }
 
 KnowledgeBase::~KnowledgeBase(){
-	cout<<"destructed KnowledgeBase\n";
+	//cout<<"destructed KnowledgeBase\n";
 }
 
 // Access Functions ------------------------------------------------------------
@@ -67,8 +67,11 @@ void KnowledgeBase::remove(vector<string> data) {
 
 vector<vector<string>> KnowledgeBase::getFacts(){
 	vector<vector<string>> ret;
+	
+	//iterate through the kb
 	for(pair<string, vector<vector<string>>> element : fact_map ){
 		for(int i=0; i<element.second.size(); i++){
+			//insert to vector
 			vector<string> fact = element.second[i];
 			fact.insert(fact.begin(), element.first);
 			ret.push_back(fact);

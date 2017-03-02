@@ -5,14 +5,18 @@
 #include "KnowledgeBase.h"
 #include "Parser.h"
 
+
+//helper function for initail processing of input
 void get_usr_in(InferenceEngine * p_i){
 	while(true){
 		string ch;
 		getline(cin, ch);
+		
+		//check for  quit
 		if(ch == "quit" || ch == "q"){
 			break;
-		}else if(ch == "print" || ch == "p"){
-			//p_p->printLines();
+			
+		//otherwise send on to the inference engine
 		}else{
 			stringstream newStream(ch);
 			p_i->processLine(newStream);
@@ -23,9 +27,14 @@ void get_usr_in(InferenceEngine * p_i){
 }
 
 int main(int argc, char* argv[]){
+	
+	//initialize the engine, then begine obtaining input
 	InferenceEngine *ie = new InferenceEngine();
-	//Parser *p = new Parser();
-	//RuleBase *rb = new RuleBase();
+	get_usr_in(ie);
+	
+	/*
+	Parser *p = new Parser();
+	RuleBase *rb = new RuleBase();
 	
 	if(argc > 1){
 		for(int i=1; i<argc; i++){
@@ -33,12 +42,9 @@ int main(int argc, char* argv[]){
 			//ie->processLine(strs);
 		}
 	}
-	
-	get_usr_in(ie);
+	*/
 	
 	delete(ie);
-	//delete(p);
-	//delete(rb);
 	
 	return 0;
 }

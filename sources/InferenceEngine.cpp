@@ -4,10 +4,11 @@
 #include "Parser.h"
 
 InferenceEngine::InferenceEngine(){
-	cout<<"construct InferenceEngine\n";
+	//cout<<"construct InferenceEngine\n";
 	kb = new KnowledgeBase();
 	rb = new RuleBase();
 	
+	//Fill map with all SRI commands
 	funcMap.insert(make_pair("FACT", &InferenceEngine::processFact));
 	funcMap.insert(make_pair("RULE", &InferenceEngine::processRule));
 	funcMap.insert(make_pair("LOAD", &InferenceEngine::processLoad));
@@ -20,7 +21,7 @@ InferenceEngine::~InferenceEngine(){
 	delete(kb);
 	delete(rb);
 	delete(p);
-	cout<<"destruct InferenceEngine\n";
+	//cout<<"destruct InferenceEngine\n";
 }
 
 void InferenceEngine::processLine(stringstream & p_ss){
@@ -29,34 +30,47 @@ void InferenceEngine::processLine(stringstream & p_ss){
 	string rest = ""; //unimportant characters (like comments)
 	
 	getline(p_ss, action, ' ');
-	getline(p_ss, rest, '#');
+	getline(p_ss, rest, '#'); //ignore comments
 	stringstream newStream(rest);
 	getline(newStream, body);
 	
+	//check for incorrect command
 	InEnMFP func = funcMap[action];
 	if(func!=NULL){
-		(this->*func)(body);
+		(this->*func)(body); //call mapped function
 	}else{
 		cout<<"Could not process that instruction"<<endl;
 	}
 }
 
 void InferenceEngine::processFact(string p_string){
-	cout<<"added fact "<<p_string<<endl;
+	//cout<<"added fact "<<p_string<<endl;
+	
+	//parse fact string
 	vector<string> fact = p->processFact(p_string);
+	
+	//add to kb
 	kb->add(fact);
 }
 
 void InferenceEngine::processRule(string p_string){
-	cout<<"added rule "<<p_string<<endl;
+	//cout<<"added rule "<<p_string<<endl;
+	
+	//parse rule string
 	map<string, vector<string>> rule = p->processRule(p_string);
+	
+	//add to rb
 	rb->add(rule);
 }
 
 void InferenceEngine::processLoad(string p_string){
-	cout<<"Inference processing Load"<<endl;
+	//cout<<"Inference processing Load"<<endl;
+	
+	//read in file
 	ifstream readFile(p_string);
 	string line;
+	
+	//process each line and execute command
 	while(getline(readFile, line)){
 		stringstream iss(line);
 		processLine(iss);
@@ -64,32 +78,41 @@ void InferenceEngine::processLoad(string p_string){
 }
 
 void InferenceEngine::processDump(string p_string){
-	cout<<"Inference processing Dump"<<endl;
+	//cout<<"Inference processing Dump"<<endl;
+	
+	//create file named p_string
 	ofstream outputFile;
 	outputFile.open(p_string);
+	
+	//load facts and rules from rb and kb
 	vector<vector<string>> facts;
 	vector<map<string, vector<string>>> rules;
 	facts = kb->getFacts();
 	rules = rb->getRules();
+	
+	//interate through facts and write
 	for(int i=0; i<facts.size(); i++){
 		vector<string> th = facts[i];
 		string fact = genFact(th);
-		if(p_string=="") cout<<fact<<endl;
-		else outputFile<<fact<<endl;
+		if(p_string=="") cout<<fact<<endl; //if no file given print to cout
+		else outputFile<<fact<<endl; //write to file
 	}
+	
+	//iterate through rules and write
 	for(int i=0; i<rules.size(); i++){
 		map<string, vector<string>> th = rules[i];
 		//vector<string> th = rules[i];
 		string rule = genRule(th);
-		if(p_string=="") cout<<rule<<endl;
-		else outputFile<<rule<<endl;
+		if(p_string=="") cout<<rule<<endl; //if no file given print to cout
+		else outputFile<<rule<<endl; //write to file
 	}
 	outputFile.close();
 }
 
 //INFERENCE------------------------------------------------------------------------------
 void InferenceEngine::processInference(string p_string){
-	cout<<"Inference processing Inference"<<endl;
+	//cout<<"Inference processing Inference"<<endl;
+	
 	vector<string> query = p->processInference(p_string);
 	string name = query[0];
 	query.erase(query.begin());
@@ -118,10 +141,8 @@ void InferenceEngine::processInference(string p_string){
 	
 	//RULE INFERENCE
 	if(rb->check(name)){
-		for(int i=0; i<query.size(); i++){
-			//cout<<query[i]<<endl;
-		}
 		vector<map<string,string>> results = inferenceRule(name, query);
+		
 		auto q = results[0];
 		results.erase(results.begin());
 		if(q["returned"] == "false"){
@@ -204,8 +225,6 @@ vector<map<string,string>> InferenceEngine::inferenceRule(string p_name, vector<
 	int s = p_vars.size();
 	map<string, vector<string>> rule = findRule(p_name, s); //get the rule we want to use
 	string ret = rule["returned"][0]; //ret = "false" if rule doesnt exist, "true" if it does
-	
-	//rule.erase("returned");
 
 	map<string,string> vars;
 	for(int i=0; i<p_vars.size(); i++){
@@ -219,30 +238,42 @@ vector<map<string,string>> InferenceEngine::inferenceRule(string p_name, vector<
 		result.push_back(fa);
 		return result;
 	}
-
+	
+	//build target vector
 	vector<vector<string>> targets;
 	for(int i=1; i<rule["ts"].size()+1; i++){
 		string target = "target"+to_string(i);
 		vector<string> t = rule[target];
 		targets.push_back(t);
 	}
-
+	
+	//process the rule targets
 	vector<vector<map<string,string>>> target_returns;
 	for(int i=0; i<targets.size(); i++){
 		string name = targets[i][0];
 		targets[i].erase(targets[i].begin());
+		
+		//infer target fact
 		if(kb->check(name)){
 			vector<map<string,string>> t = inferenceFact(name, targets[i]);
 			target_returns.push_back(t);
+			
+		//infer targer rule
 		}else if(rb->check(name)){
 			vector<map<string,string>> t = inferenceRule(name, targets[i]);
 			t.erase(t.begin());
 			target_returns.push_back(t);
 		}
 	}
+	
+	//Run logical operand on targets
 	string op = rule["operand"][0];
+	
+	//AND inference
 	if(op == "AND"){
 		result = findAND(target_returns);
+		
+	//OR inference
 	}else if(op == "OR"){
 		for(int i = 0; i<target_returns.size(); i++){
 			for(int j = 0; j<target_returns[i].size(); j++){
@@ -254,7 +285,7 @@ vector<map<string,string>> InferenceEngine::inferenceRule(string p_name, vector<
 		}
 		
 	}
-
+	
 	map<string,string> fa;
 	fa["returned"] = "true";
 	result.insert(result.begin(), fa);
@@ -333,12 +364,15 @@ vector<map<string,string>> InferenceEngine::findAND(vector<vector<map<string,str
 }
 
 void InferenceEngine::processDrop(string p_string){
+	//check for matching fact
 	if(kb->check(p_string)){
 		kb->removeAll(p_string);
 		cout<<"removed all FACTS with name "<<p_string<<endl;
 	}else{
 		cout<<"No FACTS of this name"<<endl;
 	}
+	
+	//check for matching rule
 	if(rb->check(p_string)){
 		rb->removeAll(p_string);
 		cout<<"removed all RULES with name"<<p_string<<endl;
@@ -349,30 +383,43 @@ void InferenceEngine::processDrop(string p_string){
 
 string InferenceEngine::genFact(vector<string> p_strings){
 	string ret = "";
+	
+	//write the FACT command string
 	stringstream s_stream("FACT ", ios_base::in | ios_base::out);
 	s_stream << "FACT "<< p_strings[0] << "(";
 	int i;
+	
+	//write all params
 	for(i=1; i<p_strings.size()-1; i++){
 		string s = p_strings[i];
 		s_stream<<s<<", ";
 	}
+	
+	//close string and return
 	string s = p_strings[i];
 	s_stream<<s<<")";
 	getline(s_stream, ret);
+	
 	return ret;
 }
 
 string InferenceEngine::genRule(map<string, vector<string>> p_rule){
 	string ret = "";
+	
+	//write the RULE command string
 	stringstream s_stream(ios_base::in | ios_base::out);
 	s_stream<<"RULE "<<p_rule["name"][0]<<"(";
 	
+	//write all the var params
 	int i;
 	for(i=0; i<p_rule["vars"].size()-1; i++){
 		s_stream<<p_rule["vars"][i]<<",";
 	}
+	
+	//add the operand and :-
 	s_stream<<p_rule["vars"][i]<<"):- "<<p_rule["operand"][0];
-
+	
+	//write all the targets
 	for(int t=1; t<=p_rule["ts"].size(); t++){
 		string target = "target"+to_string(t);
 		s_stream<<" "<<p_rule[target][0]<<"(";
@@ -383,7 +430,7 @@ string InferenceEngine::genRule(map<string, vector<string>> p_rule){
 		}
 		s_stream<<p_rule[target][j]<<")";
 	}
-	
 	getline(s_stream, ret);
+	
 	return ret;
 }
