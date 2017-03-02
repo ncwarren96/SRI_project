@@ -208,8 +208,6 @@ vector<map<string,string>> InferenceEngine::inferenceRule(string p_name, vector<
 		fa["returned"] = "false";
 		result.push_back(fa);
 		return result;
-	}else{
-		
 	}
 
 	vector<vector<string>> targets;
@@ -232,16 +230,17 @@ vector<map<string,string>> InferenceEngine::inferenceRule(string p_name, vector<
 			target_returns.push_back(t);
 		}
 	}
-
 	string op = rule["operand"][0];
-
 	if(op == "AND"){
 		result = findAND(target_returns);
 	}else if(op == "OR"){
-		//result = findOR(target_returns);
+		for(int i = 0; i<target_returns.size(); i++){
+			vector<map<string,string>> temp = target_returns[i];
+			
+		}
+		
 	}
 
-	//result = findAND(target_returns);
 	map<string,string> fa;
 	fa["returned"] = "true";
 	result.insert(result.begin(), fa);
@@ -318,8 +317,6 @@ vector<map<string,string>> InferenceEngine::findAND(vector<vector<map<string,str
 
 	return result;
 }
-
-
 
 void InferenceEngine::processDrop(string p_string){
 	if(kb->check(p_string)){

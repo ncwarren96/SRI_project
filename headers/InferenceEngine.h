@@ -26,6 +26,7 @@ class InferenceEngine{
 		vector<map<string,string>> inferenceRule(string p_name, vector<string> & p_vars);
 		map<string, vector<string>> findRule(string p_name, int p_size);
 		vector<map<string,string>> findAND(vector<vector<map<string,string>>> p_targets);
+		vector<map<string,string>> findOR (vector<vector<map<string,string>>> p_targets);
 		void processInference(string p_string);
 		void processDrop(string p_string);
 		
