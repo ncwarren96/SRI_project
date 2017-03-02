@@ -138,7 +138,17 @@ void InferenceEngine::processInference(string p_string){
 				cout<<endl;
 			}
 		}else{
-			
+			// create new facts from results
+			vector<string> fact;
+			for(int i = 0; i < results.size(); i++) {
+				fact.push_back(outfact);
+				for(int p = 0; p<query.size(); p++) {
+					string par = query[p];
+					fact.push_back(results[i][par]);
+				}
+				kb->add(fact);
+				fact.clear();
+			}
 		}
 
 	}
