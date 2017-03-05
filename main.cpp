@@ -1,5 +1,4 @@
 #include "common.h"
-#include "InfoBase.h"
 #include "InferenceEngine.h"
 #include "RuleBase.h"
 #include "KnowledgeBase.h"
