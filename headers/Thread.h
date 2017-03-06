@@ -14,8 +14,8 @@
 class Thread    // Thread Class
 {
 	protected:
-                pthread_attr_t pthread_attr; // pthread attribute data member
-                long cpu_count;     // Number of CPUs data member
+        pthread_attr_t pthread_attr; // pthread attribute data member
+        long cpu_count;     // Number of CPUs data member
 		pthread_t pthread;  // pthread_t identifier data member
 		char identifier[128]; // A printable thread identifier represented by the time th thread created
 		bool started;   // A flag indicating if a thread is started or not

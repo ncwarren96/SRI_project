@@ -2,6 +2,7 @@
 #include "KnowledgeBase.h"
 #include "RuleBase.h"
 #include "Parser.h"
+#include "Thread.h"
 
 InferenceEngine::InferenceEngine(){
 	//cout<<"construct InferenceEngine\n";
@@ -112,7 +113,7 @@ void InferenceEngine::processDump(string p_string){
 //INFERENCE------------------------------------------------------------------------------
 void InferenceEngine::processInference(string p_string){
 	//cout<<"Inference processing Inference"<<endl;
-	
+	//Thread * thread = new Thread()
 	vector<string> query = p->processInference(p_string);
 	string name = query[0];
 	query.erase(query.begin());
