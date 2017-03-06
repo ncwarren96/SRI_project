@@ -51,8 +51,10 @@ void Thread::start()
 {
     pthread_mutex_lock(&mutex); // Acquire lock before forking the thread
     started=true; // Set started to true
+	
     // Invoke pthread create and pass to the routine the current object as the start routine need to be static
     int created = pthread_create (&pthread,&pthread_attr,threadRoutine,this);
+	
     if ( created != 0 ) // If the return in not zero then pthread_create failed
     {
         // Print an error message with the return integer value
