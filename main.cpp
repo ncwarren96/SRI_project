@@ -3,6 +3,8 @@
 #include "RuleBase.h"
 #include "KnowledgeBase.h"
 #include "Parser.h"
+#include "Thread.h"
+#include "ThreadManager.h"
 
 
 //helper function for initail processing of input
@@ -26,6 +28,14 @@ void get_usr_in(InferenceEngine * p_i){
 }
 
 int main(int argc, char* argv[]){
+
+	
+	/*	//Here's an example of declaring a new thread and manager, but it does
+		//not compile because Thread is an abstract class
+	ThreadManager * tm = new ThreadManager();
+	Thread * aaa = new Thread();
+	tm->addThread(aaa);
+	*/
 	
 	//initialize the engine, then begine obtaining input
 	InferenceEngine *ie = new InferenceEngine();
