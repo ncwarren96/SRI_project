@@ -275,6 +275,7 @@ vector<map<string,string>> InferenceEngine::inferenceRule(string p_name, vector<
 		result = findAND(target_returns);
 		
 	//OR inference
+	//use threads here?
 	}else if(op == "OR"){
 		for(int i = 0; i<target_returns.size(); i++){
 			for(int j = 0; j<target_returns[i].size(); j++){

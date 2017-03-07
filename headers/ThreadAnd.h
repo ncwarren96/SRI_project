@@ -1,9 +1,9 @@
 #include "common.h"
 #include "Thread.h"
 
-class ThreadChild : public Thread{
+class ThreadAnd : public Thread{
 	public:
-		ThreadChild();
+		ThreadAnd();
 		virtual void * threadMainBody(void * arg);
-		~ThreadChild();
+		~ThreadAnd();
 };

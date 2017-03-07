@@ -3,9 +3,10 @@
 #include "RuleBase.h"
 #include "KnowledgeBase.h"
 #include "Parser.h"
-#include "Thread.h"
 #include "ThreadManager.h"
-#include "ThreadChild.h"
+#include "ThreadAnd.h"
+#include "ThreadOr.h"
+
 
 
 //helper function for initail processing of input
@@ -31,11 +32,13 @@ void get_usr_in(InferenceEngine * p_i){
 int main(int argc, char* argv[]){
 
 	
-	//Here's an example of declaring a new thread and manager, but it does
-	//not compile because Thread is an abstract class
+	//Here's an example of declaring a new thread and manager and starting
+	//not part of final code
 	ThreadManager * tm = new ThreadManager();
-	ThreadChild * aaa = new ThreadChild();
+	ThreadAnd * aaa = new ThreadAnd();
+	ThreadOr * ooo = new ThreadOr();
 	tm->addThread(aaa);
+	tm->addThread(ooo);
 	tm->start();
 	
 	
@@ -56,6 +59,7 @@ int main(int argc, char* argv[]){
 	*/
 	
 	delete(ie);
+	delete(tm); //will also delete all threads
 	
 	return 0;
 }

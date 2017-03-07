@@ -1,8 +1,8 @@
 HEADERS=./headers
 SOURCES=./sources
-SOURCESLIST=$(SOURCES)/InferenceEngine.cpp $(SOURCES)/InfoBase.cpp $(SOURCES)/KnowledgeBase.cpp $(SOURCES)/RuleBase.cpp $(SOURCES)/Parser.cpp $(SOURCES)/Thread.cpp $(SOURCES)/ThreadManager.cpp $(SOURCES)/ThreadChild.cpp
+SOURCESLIST=$(SOURCES)/InferenceEngine.cpp $(SOURCES)/InfoBase.cpp $(SOURCES)/KnowledgeBase.cpp $(SOURCES)/RuleBase.cpp $(SOURCES)/Parser.cpp $(SOURCES)/Thread.cpp $(SOURCES)/ThreadManager.cpp $(SOURCES)/ThreadAnd.cpp $(SOURCES)/ThreadOr.cpp
 OBJECTS=./objects
-OBJECTSLIST=$(OBJECTS)/main.o $(OBJECTS)/InferenceEngine.o $(OBJECTS)/Parser.o $(OBJECTS)/InfoBase.o $(OBJECTS)/KnowledgeBase.o $(OBJECTS)/RuleBase.o $(OBJECTS)/Thread.o $(OBJECTS)/ThreadManager.o $(OBJECTS)/ThreadChild.o
+OBJECTSLIST=$(OBJECTS)/main.o $(OBJECTS)/InferenceEngine.o $(OBJECTS)/Parser.o $(OBJECTS)/InfoBase.o $(OBJECTS)/KnowledgeBase.o $(OBJECTS)/RuleBase.o $(OBJECTS)/Thread.o $(OBJECTS)/ThreadManager.o $(OBJECTS)/ThreadAnd.o $(OBJECTS)/ThreadOr.o
 EXEC =sri
 GCC=g++
 DEBUG= -g
@@ -42,5 +42,8 @@ $(OBJECTS)/Thread.o: $(SOURCES)/Thread.cpp
 $(OBJECTS)/ThreadManager.o: $(SOURCES)/ThreadManager.cpp
 	$(GCC) $(DEBUG) $(GCC_FLAGS) $(INCLUDES) $(SOURCES)/ThreadManager.cpp -o $(OBJECTS)/ThreadManager.o
 	
-$(OBJECTS)/ThreadChild.o: $(SOURCES)/ThreadChild.cpp
-	$(GCC) $(DEBUG) $(GCC_FLAGS) $(INCLUDES) $(SOURCES)/ThreadChild.cpp -o $(OBJECTS)/ThreadChild.o
+$(OBJECTS)/ThreadAnd.o: $(SOURCES)/ThreadAnd.cpp
+	$(GCC) $(DEBUG) $(GCC_FLAGS) $(INCLUDES) $(SOURCES)/ThreadAnd.cpp -o $(OBJECTS)/ThreadAnd.o
+
+$(OBJECTS)/ThreadOr.o: $(SOURCES)/ThreadOr.cpp
+	$(GCC) $(DEBUG) $(GCC_FLAGS) $(INCLUDES) $(SOURCES)/ThreadOr.cpp -o $(OBJECTS)/ThreadOr.o

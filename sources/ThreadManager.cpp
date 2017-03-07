@@ -24,4 +24,5 @@ void ThreadManager::barrier() {
 ThreadManager::~ThreadManager() {
 	// Loop on threads vector and delete all threads
 	for ( int i = 0 ; i < threads.size();i++) delete (threads[i]);
+	cout<<"destructed ThreadManager and all threads"<<endl;
 }
