@@ -4,8 +4,6 @@
 #include "KnowledgeBase.h"
 #include "Parser.h"
 #include "ThreadManager.h"
-#include "ThreadAnd.h"
-#include "ThreadOr.h"
 
 
 
@@ -29,17 +27,15 @@ void get_usr_in(InferenceEngine * p_i){
 	}
 }
 
+void call_from_thread() {
+	cout << "Hello, World" <<endl;
+}
+
 int main(int argc, char* argv[]){
 
 	
 	//Here's an example of declaring a new thread and manager and starting
 	//not part of final code
-	ThreadManager * tm = new ThreadManager();
-	ThreadAnd * aaa = new ThreadAnd();
-	ThreadOr * ooo = new ThreadOr();
-	tm->addThread(aaa);
-	tm->addThread(ooo);
-	tm->start();
 	
 	
 	//initialize the engine, then begine obtaining input
@@ -59,7 +55,7 @@ int main(int argc, char* argv[]){
 	*/
 	
 	delete(ie);
-	delete(tm); //will also delete all threads
+	//delete(tm); //will also delete all threads
 	
 	return 0;
 }
