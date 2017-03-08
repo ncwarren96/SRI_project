@@ -225,7 +225,7 @@ vector<map<string,string>> InferenceEngine::inferenceFact(string p_name, vector<
 	//iterate through all matching facts
 	for(int fact = 0; fact<members.size(); fact++){
 		// create a thread for each fact to check if they match the desired form concurrently
-		cout<<"creating thread in inferenceFact" << endl;
+		
 		thread_mgr->addThread(new thread(evalFact, members[fact], nparams, p_vars, &result));
 		
 	}
@@ -272,11 +272,11 @@ vector<map<string,string>> InferenceEngine::inferenceRule(string p_name, vector<
 		
 		//infer target fact
 		if(kb->check(name)){
-			cout<< "before inferenceFact async call" << endl;
+			
 			auto fut_t = async(&InferenceEngine::inferenceFact, this, name, std::ref(targets[i]));
 			vector<map<string,string>> t = fut_t.get();
 			target_returns.push_back(t);
-			cout<< "after inferenceFact async call" << endl;
+			
 			
 		//infer target rule
 		}else if(rb->check(name)){
