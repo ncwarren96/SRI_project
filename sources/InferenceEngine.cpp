@@ -4,6 +4,9 @@
 #include "Parser.h"
 #include "Thread.h"
 
+// mutexes used
+mutex fact_result_mtx;
+
 InferenceEngine::InferenceEngine(){
 	//cout<<"construct InferenceEngine\n";
 	kb = new KnowledgeBase();
@@ -110,6 +113,45 @@ void InferenceEngine::processDump(string p_string){
 	outputFile.close();
 }
 
+// THREAD FUNCTIONS ---------------------------------------------------------------------
+
+void InferenceEngine::evalFact(vector<string> member, int *nparams, vector<string> * p_vars, vector< map<string,string>> *result) {
+
+	if(*nparams != member.size()) return; // if param numbers dont match, move to next fact in the kb
+
+		map<string,string> param_map; 
+		bool matches = true;
+
+		//iterate through each queried param ($X, $Y, $Z)
+		for(int i=0; i<*nparams; i++){
+
+			string curr = p_vars->at(i); //the current queried param ($X)
+			string fact_item = member[i]; //the next item in curent fact
+
+			//check if curr has been mapped
+			if(param_map.find(curr) == param_map.end()){
+
+				//if not mapped, map to next rule param
+				param_map[curr] = fact_item;
+			}else{
+
+				//check if curr is same as the mapped item
+				if(param_map[curr] != fact_item){
+					matches = false;
+					break; //the fact does not match query
+				}
+			}
+		}
+	// CRITICAL SECTION ------------------
+		fact_result_mtx.lock();
+		//if the fact has parameters that match the queried params ($X, $Y, $Z) add the map to the result
+		if(matches){
+			result->push_back(param_map);
+		}
+		fact_result_mtx.unlock();
+	// CRITICAL SECTION END --------------
+}
+
 //INFERENCE------------------------------------------------------------------------------
 void InferenceEngine::processInference(string p_string){
 	//cout<<"Inference processing Inference"<<endl;
@@ -180,43 +222,16 @@ vector<map<string,string>> InferenceEngine::inferenceFact(string p_name, vector<
 	
 	vector<vector<string>> members = kb->lookup(p_name); //get fact vector
 	int nparams = p_vars.size(); //get num params that are being queried 
-	vector< map<string,string>> result; //NEEDS TO BE INITIALIZED, THIS CAUSES SEG FAULT
-		
+	vector< map<string,string>> result; 
 		
 	//iterate through all matching facts
-	for(int fact = 0; fact<members.size(); fact++){
+	//for(int fact = 0; fact<members.size(); fact++){
 			
-		if(nparams != members[fact].size()) continue; // if param numbers dont match, move to next fact in the kb
-
-		map<string,string> param_map; 
-		bool matches = true;;
-
-		//iterate through each queried param ($X, $Y, $Z)
-		for(int i=0; i<nparams; i++){
-
-			string curr = p_vars[i]; //the current queried param ($X)
-			string fact_item = members[fact][i]; //the next item in curent fact
-
-			//check if curr has been mapped
-			if(param_map.find(curr) == param_map.end()){
-
-				//if not mapped, map to next rule param
-				param_map[curr] = fact_item;
-			}else{
-
-				//check if curr is same as the mapped item
-				if(param_map[curr] != fact_item){
-					matches = false;
-					break; //the fact does not match query
-				}
-			}
-		}
-
-		//if the fact has parameters that match the queried params ($X, $Y, $Z) add the map to the result
-		if(matches){
-			result.push_back(param_map);
-		}
-	}
+		// here's where our threads go
+		// first param of threads ('member' in evalFact) is members[fact]
+		evalFact(members[0], &nparams, &p_vars, &result);
+	//}
+	
 	return result;
 }
 

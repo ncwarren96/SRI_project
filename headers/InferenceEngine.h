@@ -11,7 +11,7 @@ class InferenceEngine{
 		KnowledgeBase * kb;
 		RuleBase * rb;
 		Parser * p;
-	
+		
 	
 	public:
 		InferenceEngine();
@@ -32,4 +32,7 @@ class InferenceEngine{
 		
 		string genFact(vector<string> p_strings); // generates a string representing a fact
 		string genRule(map<string, vector<string>> p_rule); // generates a string representing a rule
+	
+	
+		void evalFact(vector<string> member, int *nparams, vector<string> *p_vars, vector< map<string,string>> * result); // used with threads for inferencing facts
 };
