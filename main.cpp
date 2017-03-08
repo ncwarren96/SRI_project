@@ -31,8 +31,17 @@ void call_from_thread() {
 
 int main(int argc, char* argv[]){
 
-	thread t1(call_from_thread)
+	//thread t1(call_from_thread);
+	ThreadManager * tm = new ThreadManager();
+	//tm->addThread(thread(call_from_thread));
+	thread * th1 = new thread(call_from_thread);
+	thread * th2 = new thread(call_from_thread);
+	thread * th3 = new thread(call_from_thread);
+	tm->addThread(th1);
+	tm->addThread(th2);
+	tm->addThread(th3);
 	
+	tm->joinThreads();
 	//Here's an example of declaring a new thread and manager and starting
 	//not part of final code
 	
@@ -54,7 +63,7 @@ int main(int argc, char* argv[]){
 	*/
 	
 	delete(ie);
-	//delete(tm); //will also delete all threads
+	delete(tm); //will also delete all threads
 	
 	return 0;
 }
