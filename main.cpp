@@ -5,8 +5,6 @@
 #include "Parser.h"
 #include "ThreadManager.h"
 
-
-
 //helper function for initail processing of input
 void get_usr_in(InferenceEngine * p_i){
 	while(true){
@@ -33,6 +31,7 @@ void call_from_thread() {
 
 int main(int argc, char* argv[]){
 
+	thread t1(call_from_thread)
 	
 	//Here's an example of declaring a new thread and manager and starting
 	//not part of final code
