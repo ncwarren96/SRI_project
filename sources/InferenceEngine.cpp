@@ -132,7 +132,7 @@ void InferenceEngine::processInference(string p_string){
 	//FACT INFERENCE
 	if(kb->check(name)){
 		vector<map<string,string>> result = inferenceFact(name, query);
-
+		
 		//print results of inference
 		for(int r=0; r<result.size(); r++){
 			for(int p=0; p<query.size(); p++){
@@ -224,11 +224,10 @@ vector<map<string,string>> InferenceEngine::inferenceFact(string p_name, vector<
 		
 	//iterate through all matching facts
 	for(int fact = 0; fact<members.size(); fact++){
-			
-		// here's where our threads go
+		// create a thread for each fact to check if they match the desired form concurrently
+		cout<<"creating thread in inferenceFact" << endl;
 		thread_mgr->addThread(new thread(evalFact, members[fact], nparams, p_vars, &result));
 		
-		// this should be a thread^^^
 	}
 	thread_mgr->joinThreads();
 	delete(thread_mgr);
@@ -273,12 +272,16 @@ vector<map<string,string>> InferenceEngine::inferenceRule(string p_name, vector<
 		
 		//infer target fact
 		if(kb->check(name)){
-			vector<map<string,string>> t = inferenceFact(name, targets[i]);
+			cout<< "before inferenceFact async call" << endl;
+			auto fut_t = async(&InferenceEngine::inferenceFact, this, name, std::ref(targets[i]));
+			vector<map<string,string>> t = fut_t.get();
 			target_returns.push_back(t);
+			cout<< "after inferenceFact async call" << endl;
 			
-		//infer targer rule
+		//infer target rule
 		}else if(rb->check(name)){
-			vector<map<string,string>> t = inferenceRule(name, targets[i]);
+			auto fut_t = async(&InferenceEngine::inferenceRule, this, name, std::ref(targets[i]));
+			vector<map<string,string>> t = fut_t.get();
 			t.erase(t.begin());
 			target_returns.push_back(t);
 		}
