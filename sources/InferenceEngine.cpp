@@ -225,12 +225,12 @@ vector<map<string,string>> InferenceEngine::inferenceFact(string p_name, vector<
 	vector< map<string,string>> result; 
 		
 	//iterate through all matching facts
-	//for(int fact = 0; fact<members.size(); fact++){
+	for(int fact = 0; fact<members.size(); fact++){
 			
 		// here's where our threads go
-		// first param of threads ('member' in evalFact) is members[fact]
-		evalFact(members[0], &nparams, &p_vars, &result);
-	//}
+		evalFact(members[fact], &nparams, &p_vars, &result);
+		// this should be a thread^^^
+	}
 	
 	return result;
 }
