@@ -5,6 +5,7 @@ ThreadManager::ThreadManager() {}
 
 // Add a thread
 void ThreadManager::addThread (thread * p_thread) {
+	cout<<"added thread"<<endl;
 	threads.push_back(p_thread); // Push back thread pointer to threads vector
 }
 
@@ -29,6 +30,6 @@ void ThreadManager::barrier() {
 // Destructor
 ThreadManager::~ThreadManager() {
 	// Loop on threads vector and delete all threads
-	//for ( int i = 0 ; i < threads.size();i++) delete (threads[i]);
+	for ( int i = 0 ; i < threads.size();i++) delete (threads[i]);
 	cout<<"destructed ThreadManager and all threads"<<endl;
 }

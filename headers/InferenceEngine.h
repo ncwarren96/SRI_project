@@ -34,5 +34,5 @@ class InferenceEngine{
 		string genRule(map<string, vector<string>> p_rule); // generates a string representing a rule
 	
 	
-		void evalFact(vector<string> member, int *nparams, vector<string> *p_vars, vector< map<string,string>> * result); // used with threads for inferencing facts
+		//void evalFact(vector<string> member, int nparams, vector<string> p_vars, vector< map<string,string>> result); // used with threads for inferencing facts
 };

@@ -2,7 +2,7 @@
 #include "KnowledgeBase.h"
 #include "RuleBase.h"
 #include "Parser.h"
-#include "Thread.h"
+#include "ThreadManager.h"
 
 // mutexes used
 mutex fact_result_mtx;
@@ -113,45 +113,6 @@ void InferenceEngine::processDump(string p_string){
 	outputFile.close();
 }
 
-// THREAD FUNCTIONS ---------------------------------------------------------------------
-
-void InferenceEngine::evalFact(vector<string> member, int *nparams, vector<string> * p_vars, vector< map<string,string>> *result) {
-
-	if(*nparams != member.size()) return; // if param numbers dont match, move to next fact in the kb
-
-		map<string,string> param_map; 
-		bool matches = true;
-
-		//iterate through each queried param ($X, $Y, $Z)
-		for(int i=0; i<*nparams; i++){
-
-			string curr = p_vars->at(i); //the current queried param ($X)
-			string fact_item = member[i]; //the next item in curent fact
-
-			//check if curr has been mapped
-			if(param_map.find(curr) == param_map.end()){
-
-				//if not mapped, map to next rule param
-				param_map[curr] = fact_item;
-			}else{
-
-				//check if curr is same as the mapped item
-				if(param_map[curr] != fact_item){
-					matches = false;
-					break; //the fact does not match query
-				}
-			}
-		}
-	// CRITICAL SECTION ------------------
-		fact_result_mtx.lock();
-		//if the fact has parameters that match the queried params ($X, $Y, $Z) add the map to the result
-		if(matches){
-			result->push_back(param_map);
-		}
-		fact_result_mtx.unlock();
-	// CRITICAL SECTION END --------------
-}
-
 //INFERENCE------------------------------------------------------------------------------
 void InferenceEngine::processInference(string p_string){
 	//cout<<"Inference processing Inference"<<endl;
@@ -218,8 +179,45 @@ void InferenceEngine::processInference(string p_string){
 	}
 }
 
+// THREAD FUNCTIONS ------------
+void evalFact(vector<string> member, int nparams, vector<string> p_vars, vector< map<string,string>> * result){
+		cout<<"thread function running"<<endl;
+		if(nparams != member.size()) return; // if param numbers dont match, move to next fact in the kb
+
+		map<string,string> param_map; 
+		bool matches = true;
+
+		//iterate through each queried param ($X, $Y, $Z)
+		for(int i=0; i<nparams; i++){
+
+			string curr = p_vars.at(i); //the current queried param ($X)
+			string fact_item = member[i]; //the next item in curent fact
+
+			//check if curr has been mapped
+			if(param_map.find(curr) == param_map.end()){
+
+				//if not mapped, map to next rule param
+				param_map[curr] = fact_item;
+			}else{
+
+				//check if curr is same as the mapped item
+				if(param_map[curr] != fact_item){
+					matches = false;
+					break; //the fact does not match query
+				}
+			}
+		}
+	// CRITICAL SECTION ------------------
+		fact_result_mtx.lock();
+		//if the fact has parameters that match the queried params ($X, $Y, $Z) add the map to the result
+		if(matches){
+			result->push_back(param_map);
+		}
+		fact_result_mtx.unlock();
+	// CRITICAL SECTION END --------------
+}
 vector<map<string,string>> InferenceEngine::inferenceFact(string p_name, vector<string> & p_vars){
-	
+	ThreadManager * thread_mgr = new ThreadManager();
 	vector<vector<string>> members = kb->lookup(p_name); //get fact vector
 	int nparams = p_vars.size(); //get num params that are being queried 
 	vector< map<string,string>> result; 
@@ -228,12 +226,16 @@ vector<map<string,string>> InferenceEngine::inferenceFact(string p_name, vector<
 	for(int fact = 0; fact<members.size(); fact++){
 			
 		// here's where our threads go
-		evalFact(members[fact], &nparams, &p_vars, &result);
+		thread_mgr->addThread(new thread(evalFact, members[fact], nparams, p_vars, &result));
+		
 		// this should be a thread^^^
 	}
-	
+	thread_mgr->joinThreads();
+	delete(thread_mgr);
 	return result;
 }
+
+
 
 vector<map<string,string>> InferenceEngine::inferenceRule(string p_name, vector<string> & p_vars){
 	
