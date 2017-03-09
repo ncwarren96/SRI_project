@@ -7,6 +7,82 @@
 // mutexes used
 mutex fact_result_mtx;
 
+// PRIVATE THREAD METHODS ----------------------------------------------
+void threadFact(vector<string> member, int nparams, vector<string> p_vars, vector< map<string,string>> * result){
+		//cout<<"thread function running"<<endl;
+		if(nparams != member.size()) return; // if param numbers dont match, move to next fact in the kb
+
+		map<string,string> param_map; 
+		bool matches = true;
+
+		//iterate through each queried param ($X, $Y, $Z)
+		for(int i=0; i<nparams; i++){
+
+			string curr = p_vars.at(i); //the current queried param ($X)
+			string fact_item = member[i]; //the next item in curent fact
+
+			//check if curr has been mapped
+			if(param_map.find(curr) == param_map.end()){
+
+				//if not mapped, map to next rule param
+				param_map[curr] = fact_item;
+			}else{
+
+				//check if curr is same as the mapped item
+				if(param_map[curr] != fact_item){
+					matches = false;
+					break; //the fact does not match query
+				}
+			}
+		}
+	// CRITICAL SECTION ------------------
+		fact_result_mtx.lock();
+		//if the fact has parameters that match the queried params ($X, $Y, $Z) add the map to the result
+		if(matches){
+			result->push_back(param_map);
+		}
+		fact_result_mtx.unlock();
+	// CRITICAL SECTION END --------------
+}
+
+void threadAND(bool * ended, bool * isTrue, vector<vector<map<string,string>>> & p_targets, vector<int> * pos, map<string,string> * eval, int curr_target) {
+	*isTrue = true;
+	vector<map<string,string>> myMaps = p_targets[curr_target];
+	int position = pos->at(curr_target);
+
+	for(auto const &x : myMaps[position]){
+
+		if(eval->count(x.first) == 0){
+			eval->emplace(x.first, x.second);
+		}else{
+			if((eval->at(x.first)!=x.second)==1){
+				*isTrue = false;
+			}
+		}
+	}
+	
+	if(curr_target==p_targets.size()-1){
+		int j = curr_target;
+		while(j>=-1){
+
+			if(j == -1){
+				*ended = true;
+				return;
+			}
+
+			pos->at(j) += 1;
+			if(pos->at(j) == p_targets[j].size()){
+				pos->at(j) = 0;
+				j -= 1;
+			}else{
+				return;
+			}
+		}
+	}
+	return;
+}
+
+
 InferenceEngine::InferenceEngine(){
 	//cout<<"construct InferenceEngine\n";
 	kb = new KnowledgeBase();
@@ -131,6 +207,10 @@ void InferenceEngine::processInference(string p_string){
 
 	//FACT INFERENCE
 	if(kb->check(name)){
+		// async not useful at this time, since future's immediately gotten
+		//auto fut_r = async(&InferenceEngine::inferenceFact, this, name, std::ref(query));
+		//vector<map<string,string>> result = fut_r.get();
+		
 		vector<map<string,string>> result = inferenceFact(name, query);
 		
 		//print results of inference
@@ -145,6 +225,10 @@ void InferenceEngine::processInference(string p_string){
 	
 	//RULE INFERENCE
 	if(rb->check(name)){
+		// async not useful at this time, since future's immediately gotten
+		//auto fut_rs = async(&InferenceEngine::inferenceRule, this, name, std::ref(query));
+		//vector<map<string,string>> results = fut_rs.get();
+		
 		vector<map<string,string>> results = inferenceRule(name, query);
 		
 		auto q = results[0];
@@ -179,43 +263,8 @@ void InferenceEngine::processInference(string p_string){
 	}
 }
 
-// THREAD FUNCTIONS ------------
-void threadFact(vector<string> member, int nparams, vector<string> p_vars, vector< map<string,string>> * result){
-		//cout<<"thread function running"<<endl;
-		if(nparams != member.size()) return; // if param numbers dont match, move to next fact in the kb
 
-		map<string,string> param_map; 
-		bool matches = true;
 
-		//iterate through each queried param ($X, $Y, $Z)
-		for(int i=0; i<nparams; i++){
-
-			string curr = p_vars.at(i); //the current queried param ($X)
-			string fact_item = member[i]; //the next item in curent fact
-
-			//check if curr has been mapped
-			if(param_map.find(curr) == param_map.end()){
-
-				//if not mapped, map to next rule param
-				param_map[curr] = fact_item;
-			}else{
-
-				//check if curr is same as the mapped item
-				if(param_map[curr] != fact_item){
-					matches = false;
-					break; //the fact does not match query
-				}
-			}
-		}
-	// CRITICAL SECTION ------------------
-		fact_result_mtx.lock();
-		//if the fact has parameters that match the queried params ($X, $Y, $Z) add the map to the result
-		if(matches){
-			result->push_back(param_map);
-		}
-		fact_result_mtx.unlock();
-	// CRITICAL SECTION END --------------
-}
 vector<map<string,string>> InferenceEngine::inferenceFact(string p_name, vector<string> & p_vars){
 	ThreadManager * thread_mgr = new ThreadManager();
 	vector<vector<string>> members = kb->lookup(p_name); //get fact vector
@@ -267,23 +316,31 @@ vector<map<string,string>> InferenceEngine::inferenceRule(string p_name, vector<
 	//process the rule targets
 	vector<vector<map<string,string>>> target_returns;
 	for(int i=0; i<targets.size(); i++){
+		// SHOULD DO THIS WITH THREADS
 		string name = targets[i][0];
 		targets[i].erase(targets[i].begin());
 		
 		//infer target fact
 		if(kb->check(name)){
+			// async not useful at this time, since future's immediately gotten
+			//auto fut_t = async(&InferenceEngine::inferenceFact, this, name, std::ref(targets[i]));
+			//vector<map<string,string>> t = fut_t.get();
 			
-			auto fut_t = async(&InferenceEngine::inferenceFact, this, name, std::ref(targets[i]));
-			vector<map<string,string>> t = fut_t.get();
+			vector<map<string,string>> t = inferenceFact(name, targets[i]);
 			target_returns.push_back(t);
 			
 			
+		
+		}
 		//infer target rule
-		}else if(rb->check(name)){
-			auto fut_t = async(&InferenceEngine::inferenceRule, this, name, std::ref(targets[i]));
-			vector<map<string,string>> t = fut_t.get();
-			t.erase(t.begin());
-			target_returns.push_back(t);
+		if(rb->check(name)){
+			// async not useful at this time, since future's immediately gotten
+			//auto fut_t = async(&InferenceEngine::inferenceRule, this, name, std::ref(targets[i]));
+			//vector<map<string,string>> t = fut_t.get();
+			
+			vector<map<string,string>> t2 = inferenceRule(name, targets[i]);
+			t2.erase(t2.begin());
+			target_returns.push_back(t2);
 		}
 	}
 	
@@ -331,6 +388,7 @@ map<string, vector<string>> InferenceEngine::findRule(string p_name, int p_size)
 }
 
 vector<map<string,string>> InferenceEngine::findAND(vector<vector<map<string,string>>> p_targets){
+	ThreadManager * thread_mgr = new ThreadManager();
 	vector<map<string,string>> result;
 	vector<map<string,string>> first = p_targets[0];
 	
@@ -340,48 +398,21 @@ vector<map<string,string>> InferenceEngine::findAND(vector<vector<map<string,str
 	while(!ended){
 		map<string,string> eval;
 		bool isTrue;
-
+		
 		for(int i=0; i<p_targets.size(); i++){
-
-			isTrue = true;
-			vector<map<string,string>> myMaps = p_targets[i];
-			int position = pos[i];
-
-			for(auto const &x : myMaps[position]){
-
-				if(eval.count(x.first) == 0){
-					eval[x.first] = x.second;
-				}else{
-					if((eval[x.first]!=x.second)==1){
-						isTrue = false;
-					}
-				}
-			}
-
-			if(i==p_targets.size()-1){
-				int j=i;
-				while(j>=-1){
-
-					if(j == -1){
-						ended = true;
-						break;
-					}
-
-					pos[j] += 1;
-					if(pos[j] == p_targets[j].size()){
-						pos[j] = 0;
-						j -= 1;
-					}else{
-						break;
-					}
-				}
-			}
+			
+			// create threads to evaluate AND concurrently
+			thread_mgr->addThread(new thread(threadAND, &ended, &isTrue, std::ref(p_targets), &pos, &eval, i));
 		}
+		// thread join 
+		thread_mgr->joinThreads();
+				  
 		if(isTrue == true){
+			
 			result.push_back(eval);
 		}
 	}
-
+ 	delete(thread_mgr);	
 	return result;
 }
 
