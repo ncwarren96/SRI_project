@@ -5,7 +5,7 @@ ThreadManager::ThreadManager() {}
 
 // Add a thread
 void ThreadManager::addThread (thread * p_thread) {
-	cout<<"added thread"<<endl;
+	cout<<"added thread "<<p_thread->get_id()<<endl;
 	threads.push_back(p_thread); // Push back thread pointer to threads vector
 }
 
@@ -17,7 +17,10 @@ void ThreadManager::start() {
 
 void ThreadManager::joinThreads(){
 	for ( int i = 0 ; i < threads.size();i++){
-		if(threads[i]->joinable()) threads[i]->join();
+		if(threads[i]->joinable()){
+			cout<<"completed thread "<<threads[i]->get_id()<<endl;
+			threads[i]->join();
+		} 
 	}
 }
 

@@ -180,8 +180,8 @@ void InferenceEngine::processInference(string p_string){
 }
 
 // THREAD FUNCTIONS ------------
-void evalFact(vector<string> member, int nparams, vector<string> p_vars, vector< map<string,string>> * result){
-		cout<<"thread function running"<<endl;
+void threadFact(vector<string> member, int nparams, vector<string> p_vars, vector< map<string,string>> * result){
+		//cout<<"thread function running"<<endl;
 		if(nparams != member.size()) return; // if param numbers dont match, move to next fact in the kb
 
 		map<string,string> param_map; 
@@ -224,9 +224,9 @@ vector<map<string,string>> InferenceEngine::inferenceFact(string p_name, vector<
 		
 	//iterate through all matching facts
 	for(int fact = 0; fact<members.size(); fact++){
-		// create a thread for each fact to check if they match the desired form concurrently
 		
-		thread_mgr->addThread(new thread(evalFact, members[fact], nparams, p_vars, &result));
+		// create a thread for each fact to check if they match the desired form concurrently
+		thread_mgr->addThread(new thread(threadFact, members[fact], nparams, p_vars, &result));
 		
 	}
 	thread_mgr->joinThreads();
