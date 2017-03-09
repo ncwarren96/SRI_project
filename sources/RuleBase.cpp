@@ -29,7 +29,19 @@ bool RuleBase::check(string name){
 // Manipulation Functions --------------------------------------------------
 void RuleBase::add(map<string, vector<string>> data){
 	string name = data["name"][0];
-	rule_map[name].push_back(data);
+	// check to see if rule already exists
+	if(rule_map.count(name) == 0) {
+		//if no rule of that name exists, add it
+		rule_map[name].push_back(data);
+		return;
+	}
+	// if it does exist, check if this rule is a duplicate
+	for(vector<map<string, vector<string>>>::iterator it = rule_map.at(name).begin(); it != rule_map.at(name).end(); ++it) {
+		if(!std::equal((*it).begin(), (*it).end(), data.begin())) {
+			// if not, add rule to rule_map
+			rule_map[name].push_back(data);
+		}
+	}
 }
 
 void RuleBase::removeAll(string name){
