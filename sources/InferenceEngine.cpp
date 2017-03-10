@@ -6,6 +6,7 @@
 
 // mutexes used
 mutex fact_result_mtx;
+mutex targ_returns;
 
 // PRIVATE THREAD METHODS ----------------------------------------------
 void threadFact(vector<string> member, int nparams, vector<string> p_vars, vector< map<string,string>> * result){
@@ -82,6 +83,33 @@ void threadAND(bool * ended, bool * isTrue, vector<vector<map<string,string>>> &
 	return;
 }
 
+void InferenceEngine::threadRule(vector<vector<string>> * targets, vector<vector<map<string,string>>> * target_returns, int curr_target) {
+	string name = targets->at(curr_target).at(0);
+	targets->at(curr_target).erase(targets->at(curr_target).begin());
+		
+	//infer target fact
+	if(kb->check(name)){
+			
+		vector<map<string,string>> t = inferenceFact(name, (*targets).at(curr_target));
+		
+		targ_returns.lock();
+		target_returns->push_back(t);
+		targ_returns.unlock();
+			
+			
+		
+	}
+	//infer target rule
+	if(rb->check(name)){
+		
+		vector<map<string,string>> t2 = inferenceRule(name, (*targets).at(curr_target));
+		t2.erase(t2.begin());
+		
+		targ_returns.lock();
+		target_returns->push_back(t2);
+		targ_returns.unlock();
+	}
+}
 
 InferenceEngine::InferenceEngine(){
 	//cout<<"construct InferenceEngine\n";
@@ -286,6 +314,7 @@ vector<map<string,string>> InferenceEngine::inferenceFact(string p_name, vector<
 
 
 vector<map<string,string>> InferenceEngine::inferenceRule(string p_name, vector<string> & p_vars){
+	ThreadManager * thread_mgr = new ThreadManager();
 	
 	vector<map<string,string>> result; //vector to return
 	int s = p_vars.size();
@@ -317,32 +346,11 @@ vector<map<string,string>> InferenceEngine::inferenceRule(string p_name, vector<
 	vector<vector<map<string,string>>> target_returns;
 	for(int i=0; i<targets.size(); i++){
 		// SHOULD DO THIS WITH THREADS
-		string name = targets[i][0];
-		targets[i].erase(targets[i].begin());
-		
-		//infer target fact
-		if(kb->check(name)){
-			// async not useful at this time, since future's immediately gotten
-			//auto fut_t = async(&InferenceEngine::inferenceFact, this, name, std::ref(targets[i]));
-			//vector<map<string,string>> t = fut_t.get();
-			
-			vector<map<string,string>> t = inferenceFact(name, targets[i]);
-			target_returns.push_back(t);
-			
-			
-		
-		}
-		//infer target rule
-		if(rb->check(name)){
-			// async not useful at this time, since future's immediately gotten
-			//auto fut_t = async(&InferenceEngine::inferenceRule, this, name, std::ref(targets[i]));
-			//vector<map<string,string>> t = fut_t.get();
-			
-			vector<map<string,string>> t2 = inferenceRule(name, targets[i]);
-			t2.erase(t2.begin());
-			target_returns.push_back(t2);
-		}
+		thread_mgr->addThread(new thread(&InferenceEngine::threadRule, this, &targets, &target_returns, i));
 	}
+	
+	thread_mgr->joinThreads();
+	
 	
 	//Run logical operand on targets
 	string op = rule["operand"][0];
@@ -368,6 +376,7 @@ vector<map<string,string>> InferenceEngine::inferenceRule(string p_name, vector<
 	map<string,string> fa;
 	fa["returned"] = "true";
 	result.insert(result.begin(), fa);
+	delete(thread_mgr);
 	return result;
 }
 

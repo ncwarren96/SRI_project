@@ -12,6 +12,8 @@ class InferenceEngine{
 		RuleBase * rb;
 		Parser * p;
 		
+		// thread class for processing rule targets
+		void threadRule(vector<vector<string>> * targets, vector<vector<map<string,string>>> * target_returns, int curr_target);
 			
 	public:
 		InferenceEngine();
