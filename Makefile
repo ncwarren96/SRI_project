@@ -1,8 +1,8 @@
 HEADERS=./headers
 SOURCES=./sources
-SOURCESLIST=$(SOURCES)/InferenceEngine.cpp $(SOURCES)/InfoBase.cpp $(SOURCES)/KnowledgeBase.cpp $(SOURCES)/RuleBase.cpp $(SOURCES)/Parser.cpp $(SOURCES)/ThreadManager.cpp
+SOURCESLIST=$(SOURCES)/InferenceEngine.cpp $(SOURCES)/InfoBase.cpp $(SOURCES)/KnowledgeBase.cpp $(SOURCES)/RuleBase.cpp $(SOURCES)/Parser.cpp $(SOURCES)/ThreadManager.cpp $(SOURCES)/TCPSocket.cpp $(SORUCES)/TCPServerSocket.cpp
 OBJECTS=./objects
-OBJECTSLIST=$(OBJECTS)/main.o $(OBJECTS)/InferenceEngine.o $(OBJECTS)/Parser.o $(OBJECTS)/InfoBase.o $(OBJECTS)/KnowledgeBase.o $(OBJECTS)/RuleBase.o $(OBJECTS)/ThreadManager.o 
+OBJECTSLIST=$(OBJECTS)/main.o $(OBJECTS)/InferenceEngine.o $(OBJECTS)/Parser.o $(OBJECTS)/InfoBase.o $(OBJECTS)/KnowledgeBase.o $(OBJECTS)/RuleBase.o $(OBJECTS)/ThreadManager.o $(OBJECTS)/TCPSocket.o $(OBJECTS)/TCPServerSocket.o
 EXEC =sri
 GCC=g++
 DEBUG= -g
@@ -38,3 +38,9 @@ $(OBJECTS)/KnowledgeBase.o: $(SOURCES)/KnowledgeBase.cpp
 	
 $(OBJECTS)/ThreadManager.o: $(SOURCES)/ThreadManager.cpp
 	$(GCC) $(DEBUG) $(GCC_FLAGS) $(INCLUDES) $(SOURCES)/ThreadManager.cpp -o $(OBJECTS)/ThreadManager.o
+
+$(OBJECTS)/TCPSocket.o: $(SOURCES)/TCPSocket.cpp
+	$(GCC) $(DEBUG) $(GCC_FLAGS) $(INCLUDES) $(SOURCES)/TCPSocket.cpp -o $(OBJECTS)/TCPSocket.o
+	
+$(OBJECTS)/TCPServerSocket.o: $(SOURCES)/TCPServerSocket.cpp
+	$(GCC) $(DEBUG) $(GCC_FLAGS) $(INCLUDES) $(SOURCES)/TCPServerSocket.cpp -o $(OBJECTS)/TCPServerSocket.o
