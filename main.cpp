@@ -4,6 +4,8 @@
 #include "KnowledgeBase.h"
 #include "Parser.h"
 #include "ThreadManager.h"
+#include "TCPServerSocket.h"
+#include "TCPSocket.h"
 
 //helper function for initail processing of input
 void get_usr_in(InferenceEngine * p_i){
@@ -27,6 +29,10 @@ void get_usr_in(InferenceEngine * p_i){
 
 int main(int argc, char* argv[]){
 
+
+	TCPServerSocket * server = new TCPServerSocket(NULL, 9999, 1);
+	server->initializeSocket();
+	server->getConnection(20,1);
 	//initialize the engine, then begine obtaining input
 	InferenceEngine *ie = new InferenceEngine();
 	get_usr_in(ie);

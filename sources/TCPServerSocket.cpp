@@ -67,12 +67,14 @@ bool TCPServerSocket::initializeSocket ( ) // Initialize server socket
 		sock = -1;
 		return false;
 	}
+		cout<<"server socket initialized"<<endl;
         return true;
 }
 
  // Wait for a client connection. if timeoutSec and timeoutMilli are zeros the method will behave in a blocking mode
 TCPSocket * TCPServerSocket::getConnection (int timeoutSec, int timeoutMilli,int readBufferSize,int writeBufferSize )
 {
+	cout<<"waiting for connection..."<<endl;
 	socklen_t sin_size ;//= sizeof(struct sockaddr_in);
         int newsock = 0;
 	if (timeoutSec==0 && timeoutMilli == 0 )// Blocking mode
