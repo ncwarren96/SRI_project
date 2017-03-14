@@ -13,9 +13,9 @@ int main(int argc, char* argv[]){
 	TCPServerSocket * server = new TCPServerSocket(INADDR_ANY, 9999, 1);
 	server->initializeSocket();
 	TCPSocket * recSock = server->getConnection(20,1);
-	char * buffer = "";
+	char * buffer = new char[256];
 	cout<<buffer<<endl;
-	int nBytes = recSock->readFromSocket(buffer, strlen("hello"));
+	int nBytes = recSock->readFromSocket(buffer, 256);
 	cout<<"num of bytes read: "<<nBytes<<endl;
 	cout<<buffer<<endl;
 	//initialize the engine, then begine obtaining input
