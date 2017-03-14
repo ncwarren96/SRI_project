@@ -35,7 +35,10 @@ int main(int argc, char* argv[]){
 		exit(1);
 	}
 	
+	//init socket with arg and port 9999
 	TCPSocket * socket = new TCPSocket(argv[1], 9999);
+	
+	//write a string to the socket
 	socket->writeToSocket("hello", strlen("hello"));
 
 	//initialize the engine, then begine obtaining input
