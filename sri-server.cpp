@@ -12,7 +12,12 @@ int main(int argc, char* argv[]){
 
 	TCPServerSocket * server = new TCPServerSocket(INADDR_ANY, 9999, 1);
 	server->initializeSocket();
-	server->getConnection(20,1);
+	TCPSocket * recSock = server->getConnection(20,1);
+	char * buffer = "";
+	cout<<buffer<<endl;
+	int nBytes = recSock->readFromSocket(buffer, strlen("hello"));
+	cout<<"num of bytes read: "<<nBytes<<endl;
+	cout<<buffer<<endl;
 	//initialize the engine, then begine obtaining input
 	InferenceEngine *ie = new InferenceEngine();
 	//get_usr_in(ie);

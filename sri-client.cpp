@@ -28,6 +28,15 @@ void get_usr_in(InferenceEngine * p_i){
 }
 
 int main(int argc, char* argv[]){
+	
+	if ( argc != 2) 
+	{
+		printf ("Usage: ./client <server-address>\n");
+		exit(1);
+	}
+	
+	TCPSocket * socket = new TCPSocket(argv[1], 9999);
+	socket->writeToSocket("hello", strlen("hello"));
 
 	//initialize the engine, then begine obtaining input
 	InferenceEngine *ie = new InferenceEngine();
