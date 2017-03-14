@@ -7,31 +7,15 @@
 #include "TCPServerSocket.h"
 #include "TCPSocket.h"
 
-//helper function for initail processing of input
-void get_usr_in(InferenceEngine * p_i){
-	while(true){
-		string ch;
-		getline(cin, ch);
-		
-		//check for  quit
-		if(ch == "quit" || ch == "q"){
-			break;
-			
-		//otherwise send on to the inference engine
-		}else{
-			stringstream newStream(ch);
-			p_i->processLine(newStream);
-			//vector<string> strs = p_p->processLine(newStream);
-			//p_i->processLine(strs);
-		}
-	}
-}
-
 int main(int argc, char* argv[]){
 
+
+	TCPServerSocket * server = new TCPServerSocket(INADDR_ANY, 9999, 1);
+	server->initializeSocket();
+	server->getConnection(20,1);
 	//initialize the engine, then begine obtaining input
 	InferenceEngine *ie = new InferenceEngine();
-	get_usr_in(ie);
+	//get_usr_in(ie);
 	
 	/*
 	Parser *p = new Parser();

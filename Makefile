@@ -1,17 +1,23 @@
 HEADERS=./headers
 SOURCES=./sources
-SOURCESLIST=$(SOURCES)/InferenceEngine.cpp $(SOURCES)/InfoBase.cpp $(SOURCES)/KnowledgeBase.cpp $(SOURCES)/RuleBase.cpp $(SOURCES)/Parser.cpp $(SOURCES)/ThreadManager.cpp $(SOURCES)/TCPSocket.cpp $(SORUCES)/TCPServerSocket.cpp
+SOURCESLIST=$(SOURCES)/InferenceEngine.cpp $(SOURCES)/InfoBase.cpp $(SOURCES)/KnowledgeBase.cpp $(SOURCES)/RuleBase.cpp $(SOURCES)/Parser.cpp $(SOURCES)/ThreadManager.cpp $(SOURCES)/TCPSocket.cpp $(SOURCES)/TCPServerSocket.cpp
 OBJECTS=./objects
-OBJECTSLIST=$(OBJECTS)/main.o $(OBJECTS)/InferenceEngine.o $(OBJECTS)/Parser.o $(OBJECTS)/InfoBase.o $(OBJECTS)/KnowledgeBase.o $(OBJECTS)/RuleBase.o $(OBJECTS)/ThreadManager.o $(OBJECTS)/TCPSocket.o $(OBJECTS)/TCPServerSocket.o
+OBJECTSLIST= $(OBJECTS)/InferenceEngine.o $(OBJECTS)/Parser.o $(OBJECTS)/InfoBase.o $(OBJECTS)/KnowledgeBase.o $(OBJECTS)/RuleBase.o $(OBJECTS)/ThreadManager.o $(OBJECTS)/TCPSocket.o $(OBJECTS)/TCPServerSocket.o
 EXEC =sri
 GCC=g++
 DEBUG= -g
 INCLUDES= -I $(HEADERS)
 GCC_FLAGS= -std=c++11 -c 
 
-$(EXEC): $(OBJECTSLIST)
-	$(GCC) -pthread $(OBJECTSLIST) -o $(EXEC)
-
+$(EXEC): $(OBJECTSLIST) $(OBJECTS)/main.o
+	$(GCC) -pthread $(OBJECTSLIST) $(OBJECTS)/main.o -o $(EXEC)
+	
+server:
+	$(GCC) -std=c++11 -pthread $(INCLUDES) sri-server.cpp $(SOURCESLIST) -o sri-server
+	
+client:
+	$(GCC) -std=c++11 -pthread $(INCLUDES) sri-client.cpp $(SOURCESLIST) -o sri-client
+	
 simple:	
 	$(GCC) -std=c++11 -pthread $(INCLUDES) main.cpp $(SOURCESLIST) -o $(EXEC)
 	
