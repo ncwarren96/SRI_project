@@ -10,11 +10,11 @@
 int main(int argc, char* argv[]){
 
 	//init server socker
-	TCPServerSocket * server = new TCPServerSocket(INADDR_ANY, 9999, 100);
+	TCPServerSocket * server = new TCPServerSocket("0.0.0.0" , 9999, 100);
 	server->initializeSocket();
 	
 	//get connected socket and init to recSock, with 20 sec timeout
-	TCPSocket * recSock = server->getConnection(20,1);
+	TCPSocket * recSock = server->getConnection();
 	
 	for(;;){
 		char * buffer = new char[256];
