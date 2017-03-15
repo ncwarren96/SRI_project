@@ -10,20 +10,24 @@
 int main(int argc, char* argv[]){
 
 	//init server socker
-	TCPServerSocket * server = new TCPServerSocket(INADDR_ANY, 9999, 1);
+	TCPServerSocket * server = new TCPServerSocket(INADDR_ANY, 9999, 100);
 	server->initializeSocket();
 	
 	//get connected socket and init to recSock, with 20 sec timeout
 	TCPSocket * recSock = server->getConnection(20,1);
 	
-	//init buffer and read from the recieved socket
-	char * buffer = new char[256];
-	int nBytes = recSock->readFromSocket(buffer, 256);
-	
-	//print recieved data
-	cout<<"num of bytes read: "<<nBytes<<endl;
-	cout<<buffer<<endl;
-	
+	for(;;){
+		char * buffer = new char[256];
+		int nBytes = recSock->readFromSocket(buffer, 256);
+		
+		cout<<"num of bytes read: "<<nBytes<<endl;
+		cout<<buffer<<endl;
+		
+		string ch(buffer);
+		if(ch == "quit" || ch == "q"){
+			break;
+		}
+	}
 	
 	//initialize the engine, then begine obtaining input
 	InferenceEngine *ie = new InferenceEngine();

@@ -27,6 +27,21 @@ void get_usr_in(InferenceEngine * p_i){
 	}
 }
 
+void get_usr_(TCPSocket * p_socket){
+	for(;;){
+		string ch;
+		getline(cin, ch);
+		
+		const char * c;
+		c = ch.c_str();
+		p_socket->writeToSocket(c, strlen(c));
+		if(ch == "quit" || ch == "q"){
+			break;
+		}
+	}
+}
+	
+	
 int main(int argc, char* argv[]){
 	
 	if ( argc != 2) 
@@ -38,26 +53,7 @@ int main(int argc, char* argv[]){
 	//init socket with arg and port 9999
 	TCPSocket * socket = new TCPSocket(argv[1], 9999);
 	
-	//write a string to the socket
-	socket->writeToSocket("hello", strlen("hello"));
-
-	//initialize the engine, then begine obtaining input
-	InferenceEngine *ie = new InferenceEngine();
-	get_usr_in(ie);
-	
-	/*
-	Parser *p = new Parser();
-	RuleBase *rb = new RuleBase();
-	
-	if(argc > 1){
-		for(int i=1; i<argc; i++){
-			//vector<string> strs = p->processLoad(argv[i]);
-			//ie->processLine(strs);
-		}
-	}
-	*/
-	
-	delete(ie);
+	get_usr_(socket);
 	
 	return 0;
 }
