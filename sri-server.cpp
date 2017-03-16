@@ -7,14 +7,14 @@
 #include "TCPServerSocket.h"
 #include "TCPSocket.h"
 
-<<<<<<< HEAD
+
 
 void connectionThread(TCPSocket * recSock) {
 	InferenceEngine *ie = new InferenceEngine();
-=======
+
 void connectionThread(TCPSocket * recSock) {
 	// handles individual client connections
->>>>>>> origin/master
+
 	
 	for(;;){
 		char * buffer = new char[256];
@@ -35,16 +35,16 @@ void connectionThread(TCPSocket * recSock) {
 	}
 	
 	//initialize the engine, then begine obtaining input
-<<<<<<< HEAD
+
 
 	//IS THE FOLLOWING NECESSARY?
 	/* 
-=======
+
 	//InferenceEngine *ie = new InferenceEngine();
 	//get_usr_in(ie);
 	
 	/*
->>>>>>> origin/master
+
 	Parser *p = new Parser();
 	RuleBase *rb = new RuleBase();
 	
