@@ -8,7 +8,7 @@
 #include "TCPSocket.h"
 
 void connectionThread(TCPSocket * recSock) {
-	
+	// handles individual client connections
 	
 	for(;;){
 		char * buffer = new char[256];
