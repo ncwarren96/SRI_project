@@ -7,14 +7,8 @@
 #include "TCPServerSocket.h"
 #include "TCPSocket.h"
 
-int main(int argc, char* argv[]){
-
-	//init server socker
-	TCPServerSocket * server = new TCPServerSocket(INADDR_ANY, 9999, 100);
-	server->initializeSocket();
+void connectionThread(TCPSocket * recSock) {
 	
-	//get connected socket and init to recSock, with 20 sec timeout
-	TCPSocket * recSock = server->getConnection(20,1);
 	
 	for(;;){
 		char * buffer = new char[256];
@@ -30,7 +24,7 @@ int main(int argc, char* argv[]){
 	}
 	
 	//initialize the engine, then begine obtaining input
-	InferenceEngine *ie = new InferenceEngine();
+	//InferenceEngine *ie = new InferenceEngine();
 	//get_usr_in(ie);
 	
 	/*
@@ -44,8 +38,29 @@ int main(int argc, char* argv[]){
 		}
 	}
 	*/
+}
+
+int main(int argc, char* argv[]){
+
+	//init server socker
+	TCPServerSocket * server = new TCPServerSocket(INADDR_ANY, 9999, 100);
+	server->initializeSocket();
 	
-	delete(ie);
+	
+	for(;;) {
+		//get connected socket and init to recSock, with 30 sec timeout
+		//TCPSocket * recSock = server->getConnection(30,1);
+		
+		// get connected socket and init to recSock, in blocking mode
+		TCPSocket * recSock = server->getConnection(0,0);
+		
+		if(recSock == NULL) break; // error occured, break the loop
+		thread * th = new thread(connectionThread, recSock);
+		th->detach(); // detach thread so it runs independantly
+	}
+	
+	delete(server);
+	//delete(ie);
 	
 	return 0;
 }
