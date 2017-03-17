@@ -7,33 +7,60 @@
 #include "TCPServerSocket.h"
 #include "TCPSocket.h"
 
-int main(int argc, char* argv[]){
 
-	//init server socker
-	TCPServerSocket * server = new TCPServerSocket("0.0.0.0" , 9999, 100);
-	server->initializeSocket();
+
+void connectionThread(TCPSocket * recSock) {
+	// handles individual client connections
+
 	
-	//get connected socket and init to recSock, with 20 sec timeout
-	TCPSocket * recSock = server->getConnection();
-	
+	InferenceEngine * ie = new InferenceEngine();
+
+	string t = "hi";
 	for(;;){
 		char * buffer = new char[256];
+		const char * c;
 		int nBytes = recSock->readFromSocket(buffer, 256);
 		
-		cout<<"num of bytes read: "<<nBytes<<endl;
-		cout<<buffer<<endl;
-		
+		string retString;
+
 		string ch(buffer);
+		cout<<buffer<<endl;
 		if(ch == "quit" || ch == "q"){
 			break;
+		}else{
+<<<<<<< HEAD
+			cout<<ch<<endl;
+			stringstream newStream(ch);
+			retString = ie->processLine(newStream);
+=======
+			stringstream newStream(ch);
+			ie->processLine(newStream);
+			//vector<string> strs = p_p->processLine(newStream);
+			//p_i->processLine(strs);
+>>>>>>> 0809bcd5547db0c2eefad6d6eafb9bbe65f3b08e
 		}
+		/*if(t == retString){
+			break;
+		}*/
+		t = retString;
+		c = t.c_str();
+		recSock->writeToSocket(c, strlen(c));
 	}
 	
+<<<<<<< HEAD
+	delete(ie);
+=======
 	//initialize the engine, then begine obtaining input
-	InferenceEngine *ie = new InferenceEngine();
+
+
+	//IS THE FOLLOWING NECESSARY?
+	/* 
+
+	//InferenceEngine *ie = new InferenceEngine();
 	//get_usr_in(ie);
 	
 	/*
+
 	Parser *p = new Parser();
 	RuleBase *rb = new RuleBase();
 	
@@ -44,8 +71,30 @@ int main(int argc, char* argv[]){
 		}
 	}
 	*/
+>>>>>>> 0809bcd5547db0c2eefad6d6eafb9bbe65f3b08e
+}
+
+int main(int argc, char* argv[]){
+
+	//init server socker
+	TCPServerSocket * server = new TCPServerSocket("0.0.0.0", 9999, 100);
+	server->initializeSocket();
 	
-	delete(ie);
+	
+	for(;;) {
+		//get connected socket and init to recSock, with 30 sec timeout
+		//TCPSocket * recSock = server->getConnection(30,1);
+		
+		// get connected socket and init to recSock, in blocking mode
+		TCPSocket * recSock = server->getConnection(0,0);
+		
+		if(recSock == NULL) break; // error occured, break the loop
+		thread * th = new thread(connectionThread, recSock);
+		th->detach(); // detach thread so it runs independantly
+	}
+	
+	delete(server);
+	//delete(ie);
 	
 	return 0;
 }

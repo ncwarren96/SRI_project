@@ -132,7 +132,7 @@ InferenceEngine::~InferenceEngine(){
 	//cout<<"destruct InferenceEngine\n";
 }
 
-void InferenceEngine::processLine(stringstream & p_ss){
+string InferenceEngine::processLine(stringstream & p_ss){
 	string action = ""; //the command entered (RULE, DUMP, etc)
 	string body = ""; //the actual line of logic
 	string rest = ""; //unimportant characters (like comments)
@@ -142,16 +142,22 @@ void InferenceEngine::processLine(stringstream & p_ss){
 	stringstream newStream(rest);
 	getline(newStream, body);
 	
+	//cout<<body<<endl;
+
+	string retString;
+
 	//check for incorrect command
 	InEnMFP func = funcMap[action];
 	if(func!=NULL){
-		(this->*func)(body); //call mapped function
+		retString = (this->*func)(body); //call mapped function
 	}else{
 		cout<<"Could not process that instruction"<<endl;
+		retString = "Could not process that instruction";
 	}
+	return retString;
 }
 
-void InferenceEngine::processFact(string p_string){
+string InferenceEngine::processFact(string p_string){
 	//cout<<"added fact "<<p_string<<endl;
 	
 	//parse fact string
@@ -159,9 +165,10 @@ void InferenceEngine::processFact(string p_string){
 	
 	//add to kb
 	kb->add(fact);
+	return "Added Fact";
 }
 
-void InferenceEngine::processRule(string p_string){
+string InferenceEngine::processRule(string p_string){
 	//cout<<"added rule "<<p_string<<endl;
 	
 	//parse rule string
@@ -169,12 +176,13 @@ void InferenceEngine::processRule(string p_string){
 	
 	//add to rb
 	rb->add(rule);
+	return "Added Rule";
 }
 
-void InferenceEngine::processLoad(string p_string){
+string InferenceEngine::processLoad(string p_string){
 	//cout<<"Inference processing Load"<<endl;
 	
-	//read in file
+	/*read in file
 	ifstream readFile(p_string);
 	string line;
 	
@@ -182,15 +190,25 @@ void InferenceEngine::processLoad(string p_string){
 	while(getline(readFile, line)){
 		stringstream iss(line);
 		processLine(iss);
+	}*/
+	//cout<<p_string<<endl;
+	stringstream news(p_string);
+	string line;
+	while(getline(news, line)){
+		stringstream iss(line);
+		processLine(iss);
 	}
+
+	return "Processed Load";
+
 }
 
-void InferenceEngine::processDump(string p_string){
+string InferenceEngine::processDump(string p_string){
 	//cout<<"Inference processing Dump"<<endl;
 	
 	//create file named p_string
 	ofstream outputFile;
-	outputFile.open(p_string);
+	//outputFile.open(p_string);
 	
 	//load facts and rules from rb and kb
 	vector<vector<string>> facts;
@@ -198,12 +216,15 @@ void InferenceEngine::processDump(string p_string){
 	facts = kb->getFacts();
 	rules = rb->getRules();
 	
+	stringstream news;
+
 	//interate through facts and write
 	for(int i=0; i<facts.size(); i++){
 		vector<string> th = facts[i];
 		string fact = genFact(th);
-		if(p_string=="") cout<<fact<<endl; //if no file given print to cout
-		else outputFile<<fact<<endl; //write to file
+		news<<fact<<endl;
+		//if(p_string=="") cout<<fact<<endl; //if no file given print to cout
+		//else outputFile<<fact<<endl; //write to file
 	}
 	
 	//iterate through rules and write
@@ -211,14 +232,16 @@ void InferenceEngine::processDump(string p_string){
 		map<string, vector<string>> th = rules[i];
 		//vector<string> th = rules[i];
 		string rule = genRule(th);
-		if(p_string=="") cout<<rule<<endl; //if no file given print to cout
-		else outputFile<<rule<<endl; //write to file
+		news<<rule<<endl;
+		//if(p_string=="") cout<<rule<<endl; //if no file given print to cout
+		//else outputFile<<rule<<endl; //write to file
 	}
-	outputFile.close();
+	return news.str();
+	//outputFile.close();
 }
 
 //INFERENCE------------------------------------------------------------------------------
-void InferenceEngine::processInference(string p_string){
+string InferenceEngine::processInference(string p_string){
 	//cout<<"Inference processing Inference"<<endl;
 	//Thread * thread = new Thread()
 	vector<string> query = p->processInference(p_string);
@@ -241,14 +264,20 @@ void InferenceEngine::processInference(string p_string){
 		
 		vector<map<string,string>> result = inferenceFact(name, query);
 		
+		stringstream news("");
+
 		//print results of inference
 		for(int r=0; r<result.size(); r++){
 			for(int p=0; p<query.size(); p++){
 				string par = query[p];
 				cout<<par<<": "<<result[r][par]<<"\t";
+				news<<par<<": "<<result[r][par]<<"\t";
 			}
+			news<<endl;
 			cout<<endl;
 		}
+
+		return news.str();
 	}
 	
 	//RULE INFERENCE
@@ -259,11 +288,14 @@ void InferenceEngine::processInference(string p_string){
 		
 		vector<map<string,string>> results = inferenceRule(name, query);
 		
+		stringstream news("");
+
 		auto q = results[0];
 		results.erase(results.begin());
 		if(q["returned"] == "false"){
 			cout<<"No rule found"<<endl;
-			return;
+			news<<"No rule found"<<endl;
+			return news.str();
 		}
 
 		if(outfact == "" || outfact == " "){
@@ -271,9 +303,12 @@ void InferenceEngine::processInference(string p_string){
 				for(int p=0; p<query.size(); p++){
 					string par = query[p];
 					cout<<par<<": "<<results[i][par]<<"\t";
+					news<<par<<": "<<results[i][par]<<"\t";
 				}
 				cout<<endl;
+				news<<endl;
 			}
+			return news.str();
 		}else{
 			// create new facts from results
 			vector<string> fact;
@@ -286,8 +321,9 @@ void InferenceEngine::processInference(string p_string){
 				kb->add(fact);
 				fact.clear();
 			}
+			news<<"FACTS added with name: "<<outfact;
+			return news.str();
 		}
-
 	}
 }
 
@@ -425,7 +461,7 @@ vector<map<string,string>> InferenceEngine::findAND(vector<vector<map<string,str
 	return result;
 }
 
-void InferenceEngine::processDrop(string p_string){
+string InferenceEngine::processDrop(string p_string){
 	//check for matching fact
 	if(kb->check(p_string)){
 		kb->removeAll(p_string);
@@ -434,13 +470,21 @@ void InferenceEngine::processDrop(string p_string){
 		cout<<"No FACTS of this name"<<endl;
 	}
 	
+	stringstream news("");
+	string str;
+
 	//check for matching rule
 	if(rb->check(p_string)){
 		rb->removeAll(p_string);
+		news<<"removed all RULES with name"<<p_string<<endl;
 		cout<<"removed all RULES with name"<<p_string<<endl;
 	}else{
+		news<<"No RULES of this name"<<endl;
 		cout<<"No RULES of this name"<<endl;
 	}
+
+	getline(news, str);
+	return str;
 }
 
 string InferenceEngine::genFact(vector<string> p_strings){

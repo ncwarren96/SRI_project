@@ -18,6 +18,8 @@ void get_usr_in(InferenceEngine * p_i){
 			break;
 			
 		//otherwise send on to the inference engine
+		}else if(ch == "LOAD"){
+
 		}else{
 			stringstream newStream(ch);
 			p_i->processLine(newStream);
@@ -27,17 +29,50 @@ void get_usr_in(InferenceEngine * p_i){
 	}
 }
 
+string getLoad(string p_file){
+	stringstream newStream("");
+	newStream<<"LOAD ";
+
+	ifstream readFile(p_file);
+	string line;
+
+	while(getline(readFile, line)){
+		//cout<<line<<endl;
+		newStream<<line<<endl;
+	}
+	//cout<<newStream.str()<<endl;
+	return newStream.str();
+}
+
 void get_usr_(TCPSocket * p_socket){
 	for(;;){
-		string ch;
+		string ch, file, head;
 		getline(cin, ch);
-		
+		stringstream news(ch);
+		getline(news, head, ' ');
+
 		const char * c;
-		c = ch.c_str();
-		p_socket->writeToSocket(c, strlen(c));
+		char * buffer = new char[256];
+
 		if(ch == "quit" || ch == "q"){
+			c = ch.c_str();
+			p_socket->writeToSocket(c, strlen(c));
 			break;
+
+		}else if(head == "LOAD"){
+			getline(news, file);
+			string readFile = getLoad(file);
+			c = readFile.c_str();
+			//cout<<c<<endl;
+
+		}else{
+			c = ch.c_str();
+
 		}
+		p_socket->writeToSocket(c, strlen(c));
+		int nBytes = p_socket->readFromSocket(buffer, 256);
+		string newString(buffer);
+		cout<<newString<<endl;
 	}
 }
 	
