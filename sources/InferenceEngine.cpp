@@ -138,9 +138,17 @@ string InferenceEngine::processLine(stringstream & p_ss){
 	string rest = ""; //unimportant characters (like comments)
 	
 	getline(p_ss, action, ' ');
-	getline(p_ss, rest, '#'); //ignore comments
-	stringstream newStream(rest);
-	getline(newStream, body);
+
+	if(action == "LOAD"){
+		while(getline(p_ss, rest)){
+			body += rest + "\n";
+		}
+	}else{
+		getline(p_ss, rest, '#'); //ignore comments
+		stringstream newStream(rest);
+		getline(newStream, body);
+	}
+	
 	
 	//cout<<body<<endl;
 
@@ -196,6 +204,7 @@ string InferenceEngine::processLoad(string p_string){
 	string line;
 	while(getline(news, line)){
 		stringstream iss(line);
+		cout<<line<<endl;
 		processLine(iss);
 	}
 
@@ -207,7 +216,7 @@ string InferenceEngine::processDump(string p_string){
 	//cout<<"Inference processing Dump"<<endl;
 	
 	//create file named p_string
-	ofstream outputFile;
+	//ofstream outputFile;
 	//outputFile.open(p_string);
 	
 	//load facts and rules from rb and kb
@@ -270,11 +279,9 @@ string InferenceEngine::processInference(string p_string){
 		for(int r=0; r<result.size(); r++){
 			for(int p=0; p<query.size(); p++){
 				string par = query[p];
-				cout<<par<<": "<<result[r][par]<<"\t";
 				news<<par<<": "<<result[r][par]<<"\t";
 			}
 			news<<endl;
-			cout<<endl;
 		}
 
 		return news.str();
@@ -529,7 +536,7 @@ string InferenceEngine::genRule(map<string, vector<string>> p_rule){
 	for(int t=1; t<=p_rule["ts"].size(); t++){
 		string target = "target"+to_string(t);
 		s_stream<<" "<<p_rule[target][0]<<"(";
-		cout<<p_rule[target].size()<<endl;
+		//cout<<p_rule[target].size()<<endl;
 		int j;
 		for(j=1; j<p_rule[target].size()-1; j++){
 			s_stream<<p_rule[target][j]<<",";

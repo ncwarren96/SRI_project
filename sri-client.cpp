@@ -7,28 +7,6 @@
 #include "TCPServerSocket.h"
 #include "TCPSocket.h"
 
-//helper function for initail processing of input
-void get_usr_in(InferenceEngine * p_i){
-	while(true){
-		string ch;
-		getline(cin, ch);
-		
-		//check for  quit
-		if(ch == "quit" || ch == "q"){
-			break;
-			
-		//otherwise send on to the inference engine
-		}else if(ch == "LOAD"){
-
-		}else{
-			stringstream newStream(ch);
-			p_i->processLine(newStream);
-			//vector<string> strs = p_p->processLine(newStream);
-			//p_i->processLine(strs);
-		}
-	}
-}
-
 string getLoad(string p_file){
 	stringstream newStream("");
 	newStream<<"LOAD ";
@@ -44,6 +22,13 @@ string getLoad(string p_file){
 	return newStream.str();
 }
 
+void dumpToFile(string p_fileName, string p_fileContents){
+	ofstream outputFile;
+	outputFile.open(p_fileName);
+	outputFile<<p_fileContents;
+	outputFile.close();
+}
+
 void get_usr_(TCPSocket * p_socket){
 	for(;;){
 		string ch, file, head;
@@ -52,7 +37,7 @@ void get_usr_(TCPSocket * p_socket){
 		getline(news, head, ' ');
 
 		const char * c;
-		char * buffer = new char[256];
+		char * buffer = new char[1024];
 
 		if(ch == "quit" || ch == "q"){
 			c = ch.c_str();
@@ -65,14 +50,27 @@ void get_usr_(TCPSocket * p_socket){
 			c = readFile.c_str();
 			//cout<<c<<endl;
 
+		}else if(head == "DUMP"){
+			getline(news, file);
+			c = head.c_str();
+
 		}else{
 			c = ch.c_str();
 
 		}
 		p_socket->writeToSocket(c, strlen(c));
-		int nBytes = p_socket->readFromSocket(buffer, 256);
+		int nBytes = p_socket->readFromSocket(buffer, 1024);
 		string newString(buffer);
-		cout<<newString<<endl;
+
+		if(head == "DUMP"){
+			if(file == "" || file == " "){
+				cout<<newString<<endl;
+			}else{
+				dumpToFile(file, newString);
+			}
+		}else{
+			cout<<newString<<endl;
+		}
 	}
 }
 	
