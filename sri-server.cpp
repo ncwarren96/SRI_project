@@ -17,22 +17,20 @@ void connectionThread(TCPSocket * recSock) {
 
 	string t = "hi";
 	for(;;){
-		char * buffer = new char[256];
+		char * buffer = new char[2048];
 		const char * c;
-		int nBytes = recSock->readFromSocket(buffer, 256);
+		int nBytes = recSock->readFromSocket(buffer, 2058);
 		
 		string retString;
 
 		string ch(buffer);
-		cout<<buffer<<endl;
+		
 		if(ch == "quit" || ch == "q"){
 			break;
 		}else{
-			cout<<ch<<endl;
+			//cout<<ch<<endl;
 			stringstream newStream(ch);
 			retString = ie->processLine(newStream);
-			stringstream newStream(ch);
-			ie->processLine(newStream);
 			//vector<string> strs = p_p->processLine(newStream);
 			//p_i->processLine(strs);
 		}
@@ -88,24 +86,6 @@ int main(int argc, char* argv[]){
 		th->detach(); // detach thread so it runs independantly
 	}
 	
-
-	TCPServerSocket * server = new TCPServerSocket(INADDR_ANY, 9999, 100);
-	server->initializeSocket();
-	
-	
-	for(;;) {
-		//get connected socket and init to recSock, with 30 sec timeout
-		//TCPSocket * recSock = server->getConnection(30,1);
-		
-		// get connected socket and init to recSock, in blocking mode
-		TCPSocket * recSock = server->getConnection(0,0);
-		
-		if(recSock == NULL) break; // error occured, break the loop
-		thread * th = new thread(connectionThread, recSock);
-		th->detach(); // detach thread so it runs independantly
-	}
-	
-
 	delete(server);
 	//delete(ie);
 	
