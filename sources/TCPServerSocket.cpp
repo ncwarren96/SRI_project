@@ -53,20 +53,20 @@ bool TCPServerSocket::initializeSocket ( ) // Initialize server socket
  		return false;
  	}
          // Bind the socket handler to the serverAddr
-        if (bind(sock, (struct sockaddr *)&serverAddr, sizeof(struct sockaddr)) == -1)
+        if (::bind(sock, (struct sockaddr *)&serverAddr, sizeof(struct sockaddr)) == -1)
         {
-            // Close socket and return false if bind failed
-			close (sock);
-			sock = -1;
-			return false;
-		}
+                // Close socket and return false if bind failed
+		close (sock);
+		sock = -1;
+		return false;
+	}
         // Listen on the socket and configure the connection queue size
         if (listen(sock, backlog) == -1)
         {
-			close (sock);
-			sock = -1;
-			return false;
-		}
+		close (sock);
+		sock = -1;
+		return false;
+	}
 		cout<<"server socket initialized"<<endl;
         return true;
 }
@@ -84,8 +84,8 @@ TCPSocket * TCPServerSocket::getConnection (int timeoutSec, int timeoutMilli,int
 
 	}
 	else { // Set up time out timeval and file descriptors set
-		fd_set fds; 
-        struct timeval tv;
+                fd_set fds; 
+                struct timeval tv;
 		tv.tv_sec = timeoutSec;
 		tv.tv_usec = timeoutMilli;
 		FD_ZERO(&fds);
@@ -98,17 +98,16 @@ TCPSocket * TCPServerSocket::getConnection (int timeoutSec, int timeoutMilli,int
 			newsock = accept(sock, (struct sockaddr *)&clientAddr,&sin_size);
 		}
 	}
-    if ( newsock < 1 ) // if newsock is less than one then erroro
-    {   // Print the error and return NULL
-        perror("ERROR on accept");
-        return NULL;
-    }
-    else{ // Else instantiate a TCPSocket object and return a pointer to it 
-            TCPSocket * tcpSocket = new TCPSocket(newsock,(char *)inet_ntoa(clientAddr.sin_addr),clientAddr.sin_port,readBufferSize,writeBufferSize);	
-			cout<<"Connection successful to "<<newsock<<endl;
-            return tcpSocket;
-    }
-    // If we are here then we return NULL
+        if ( newsock < 1 ) // if newsock is less than one then erroro
+        {   // Print the error and return NULL
+            perror("ERROR on accept");
+            return NULL;
+        }
+        else{ // Else instantiate a TCPSocket object and return a pointer to it 
+                TCPSocket * tcpSocket = new TCPSocket(newsock,(char *)inet_ntoa(clientAddr.sin_addr),clientAddr.sin_port,readBufferSize,writeBufferSize);
+                return tcpSocket;
+        }
+        // If we are here then we return NULL
 	return NULL;
 }
 TCPServerSocket::~TCPServerSocket ( ) // Destructor
