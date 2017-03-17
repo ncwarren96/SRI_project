@@ -52,7 +52,7 @@ void get_usr_(TCPSocket * p_socket){
 		getline(news, head, ' ');
 
 		const char * c;
-		char * buffer = new char[2048];
+		char * buffer = new char[256];
 
 		if(ch == "quit" || ch == "q"){
 			c = ch.c_str();
@@ -70,7 +70,7 @@ void get_usr_(TCPSocket * p_socket){
 
 		}
 		p_socket->writeToSocket(c, strlen(c));
-		int nBytes = p_socket->readFromSocket(buffer, 2048);
+		int nBytes = p_socket->readFromSocket(buffer, 256);
 		string newString(buffer);
 		cout<<newString<<endl;
 	}
@@ -89,6 +89,6 @@ int main(int argc, char* argv[]){
 	TCPSocket * socket = new TCPSocket(argv[1], 9999);
 	
 	get_usr_(socket);
-	delete(socket);
+	
 	return 0;
 }

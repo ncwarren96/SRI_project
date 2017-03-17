@@ -8,7 +8,6 @@
 #include "TCPSocket.h"
 
 
-
 void connectionThread(TCPSocket * recSock) {
 	// handles individual client connections
 
@@ -17,22 +16,20 @@ void connectionThread(TCPSocket * recSock) {
 
 	string t = "hi";
 	for(;;){
-		char * buffer = new char[2048];
+		char * buffer = new char[256];
 		const char * c;
-		int nBytes = recSock->readFromSocket(buffer, 2058);
+		int nBytes = recSock->readFromSocket(buffer, 256);
 		
 		string retString;
 
 		string ch(buffer);
-		
+		cout<<buffer<<endl;
 		if(ch == "quit" || ch == "q"){
 			break;
 		}else{
-			//cout<<ch<<endl;
+			cout<<ch<<endl;
 			stringstream newStream(ch);
 			retString = ie->processLine(newStream);
-			//vector<string> strs = p_p->processLine(newStream);
-			//p_i->processLine(strs);
 		}
 		/*if(t == retString){
 			break;
@@ -69,7 +66,6 @@ void connectionThread(TCPSocket * recSock) {
 int main(int argc, char* argv[]){
 
 	//init server socker
-
 	TCPServerSocket * server = new TCPServerSocket("0.0.0.0", 9999, 100);
 	server->initializeSocket();
 	
